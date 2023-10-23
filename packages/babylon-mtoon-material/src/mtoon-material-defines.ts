@@ -6,7 +6,7 @@ import type { IImageProcessingConfigurationDefines } from '@babylonjs/core/Mater
  * Material Defines
  */
 export class MToonMaterialDefines extends MaterialDefines implements IImageProcessingConfigurationDefines {
-    /** @see light-fragment.frag */
+    /** @see ./shaders/light-fragment.frag */
     public CUSTOMUSERLIGHTING = true;
 
     // MToon Specific
@@ -171,6 +171,7 @@ export class MToonMaterialDefines extends MaterialDefines implements IImageProce
     public MULTIVIEW = false;
     public ORDER_INDEPENDENT_TRANSPARENCY = false;
     public ORDER_INDEPENDENT_TRANSPARENCY_16BITS = false;
+    public DITHER = false;
 
     // /**
     //  * If the reflection texture on this material is in linear color space

@@ -13,8 +13,3 @@ build
 
 node_modules/
 dist/
-
-test/main.js
-test/main.js.map
-test/vendors~main.js
-test/vendors~main.js.map

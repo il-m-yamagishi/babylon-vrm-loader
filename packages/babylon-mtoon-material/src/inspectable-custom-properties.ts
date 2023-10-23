@@ -2,7 +2,7 @@ import type { IInspectable } from '@babylonjs/core/Misc/iInspectable';
 import { InspectableType } from '@babylonjs/core/Misc/iInspectable';
 
 /**
- * MToonMaterial に Inspector 上で調整可能なパラメータを設定する
+ * Get custom inspector properties for MToonMaterial
  * @link https://doc.babylonjs.com/toolsAndResources/tools/inspector#extensibility
  */
 export function getInspectableCustomProperties(): IInspectable[] {
