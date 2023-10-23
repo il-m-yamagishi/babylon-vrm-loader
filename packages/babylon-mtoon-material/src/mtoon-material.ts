@@ -38,14 +38,14 @@ import { MToonMaterialDefines } from './mtoon-material-defines';
 
 const onCreatedEffectParameters = { effect: null as unknown as Effect, subMesh: null as unknown as Nullable<SubMesh> };
 
-import UboDeclaration from './shaders/ubo-declaration.vert';
-import VertexDeclaration from './shaders/vertex-declaration.vert';
-import FragmentDeclaration from './shaders/fragment-declaration.frag';
-import FragmentFunctions from './shaders/mtoon-fragment-functions.frag';
-import BumpFragment from './shaders/bump-fragment.frag';
-import LightFragment from './shaders/light-fragment.frag';
-import VertexShader from './shaders/mtoon.vert';
-import FragmentShader from './shaders/mtoon.frag';
+import UboDeclaration from './shaders/ubo-declaration.vert?raw';
+import VertexDeclaration from './shaders/vertex-declaration.vert?raw';
+import FragmentDeclaration from './shaders/fragment-declaration.frag?raw';
+import FragmentFunctions from './shaders/mtoon-fragment-functions.frag?raw';
+import BumpFragment from './shaders/bump-fragment.frag?raw';
+import LightFragment from './shaders/light-fragment.frag?raw';
+import VertexShader from './shaders/mtoon.vert?raw';
+import FragmentShader from './shaders/mtoon.frag?raw';
 
 /**
  * Debug shading mode

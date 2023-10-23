@@ -2,8 +2,8 @@
     "compilerOptions": {
         "importHelpers": true,
         "moduleResolution": "node",
-        "module": "esNext",
-        "target": "es2017",
+        "module": "ES2020",
+        "target": "es2021",
         "declaration": true,
         "sourceMap": true,
         "experimentalDecorators": true,
@@ -14,15 +14,24 @@
         "strictNullChecks": true,
         "strictFunctionTypes": true,
         "skipLibCheck": true,
+        "removeComments": false,
         "forceConsistentCasingInFileNames": true,
-        "strictPropertyInitialization": false, // @serialize decorator
         "lib": [
             "dom",
+            "ES2017"
         ],
-        "outDir": "dist"
+        "outDir": "dist",
+        "strictPropertyInitialization": false,
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "strict": true,
+        "noFallthroughCasesInSwitch": true
     },
     "include": [
-        "./src/**/*",
+        "src",
         "./index.d.ts",
+        "index.ts",
     ]
 }
