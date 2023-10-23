@@ -1,0 +1,20 @@
+# OS or Editor folders
+*.DS_Store
+._*
+Thumbs.db
+.cache
+.tmproj
+nbproject
+*.sublime-project
+*.sublime-workspace
+.directory
+build
+.history
+
+node_modules/
+dist/
+
+test/main.js
+test/main.js.map
+test/vendors~main.js
+test/vendors~main.js.map
