@@ -22,18 +22,16 @@ export class MToonMaterialDefines extends MaterialDefines {
     public MTOON_DEBUG_LITSHADERRATE = false;
 
     // MToon textures
-    public SHADE = false;
-    public SHADEDIRECTUV = 0;
-    public RECEIVE_SHADOW = false;
-    public RECEIVE_SHADOWDIRECTUV = 0;
-    public SHADING_GRADE = false;
-    public SHADING_GRADEDIRECTUV = 0;
-    public RIM = false;
-    public RIMDIRECTUV = 0;
+    public SHADE_MULTIPLY = false;
+    public SHADE_MULTIPLYDIRECTUV = 0;
+    public SHADING_SHIFT = false;
+    public SHADING_SHIFTDIRECTUV = 0;
     public MATCAP = false;
     public MATCAPDIRECTUV = 0;
-    public OUTLINE_WIDTH = false;
-    public OUTLINE_WIDTHDIRECTUV = 0;
+    public RIM_MULTIPLY = false;
+    public RIM_MULTIPLYDIRECTUV = 0;
+    public OUTLINE_WIDTH_MULTIPLY = false;
+    public OUTLINE_WIDTH_MULTIPLYDIRECTUV = 0;
     public UV_ANIMATION_MASK = false;
     public UV_ANIMATION_MASKDIRECTUV = 0;
 

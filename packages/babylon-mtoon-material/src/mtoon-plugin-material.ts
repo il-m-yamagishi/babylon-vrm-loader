@@ -14,6 +14,10 @@ import { expandToProperty, serialize, serializeAsColor3, serializeAsTexture } fr
 import type { Nullable } from "@babylonjs/core/types";
 import { MToonMaterialDefines } from "./mtoon-material-defines";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { AbstractMesh, IAnimatable, MaterialDefines, UniformBuffer } from "@babylonjs/core";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { SubMesh } from "@babylonjs/core/Meshes/subMesh";
+import { Scene } from "@babylonjs/core/scene";
 
 /**
  * The rendering mode of outlines
@@ -306,7 +310,122 @@ export class MToonPluginMaterial extends MaterialPluginBase {
     /**
      * @inheritdoc
      */
-    public override getClassName(): string {
-        return "MToonPluginMaterial";
+    public override isReadyForSubMesh(defines: MToonMaterialDefines, scene: Scene, engine: AbstractEngine, subMesh: SubMesh): boolean {
+        if (!this._isEnabled) {
+            return true;
+        }
+
+        if (defines._areTexturesDirty && scene.texturesEnabled) {
+            if (this.textures.find((texture) => !texture.isReady())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override prepareDefines(defines: MToonMaterialDefines, scene: Scene, mesh: AbstractMesh): void {
+        if (this._isEnabled) {
+            // TODO
+        } else {
+            defines.SHADE_MULTIPLY = false;
+            defines.SHADING_SHIFT = false;
+            defines.MATCAP = false;
+            defines.RIM_MULTIPLY = false;
+            defines.OUTLINE_WIDTH_MULTIPLY = false;
+            defines.UV_ANIMATION_MASK = false;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override bindForSubMesh(uniformBuffer: UniformBuffer, scene: Scene, engine: AbstractEngine, subMesh: SubMesh): void {
+        if (!this._isEnabled) {
+            return;
+        }
+
+        // TODO
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override hasTexture(texture: BaseTexture): boolean {
+        return this.textures.includes(texture);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override getActiveTextures(activeTextures: BaseTexture[]): void {
+        activeTextures.push(...this.textures);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override getAnimatables(animatables: IAnimatable[]): void {
+        this.textures.forEach((texture) => {
+            if (texture.animations?.length) {
+                animatables.push(texture);
+            }
+        });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override dispose(forceDisposeTextures?: boolean | undefined): void {
+        if (forceDisposeTextures) {
+            this.textures.forEach((texture) => {
+                texture.dispose();
+            });
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override getSamplers(samplers: string[]): void {
+        samplers.push("shadeMultiply");
+        samplers.push("shadingShift");
+        samplers.push("matcap");
+        samplers.push("rimMultiply");
+        samplers.push("outlineWidthMultiply");
+        samplers.push("uvAnimationMask");
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override getUniforms(): { ubo?: { name: string; size?: number | undefined; type?: string | undefined; arraySize?: number | undefined; }[] | undefined; vertex?: string | undefined; fragment?: string | undefined; } {
+        // TODO
+        return {};
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override getCustomCode(shaderType: string): Nullable<{ [pointName: string]: string; }> {
+        // TODO
+        return null;
+    }
+
+    /**
+     * Get active textures
+     */
+    private get textures(): BaseTexture[] {
+        return [
+            this.shadeMultiplyTexture,
+            this.shadingShiftTexture,
+            this.matcapTexture,
+            this.rimMultiplyTexture,
+            this.outlineWidthMultiplyTexture,
+            this.uvAnimationMaskTexture,
+        ].filter((texture) => texture !== null) as BaseTexture[];
     }
 }
