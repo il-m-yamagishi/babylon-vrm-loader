@@ -1,0 +1,6 @@
+#include<samplerVertexImplementation>(_DEFINENAME_,SHADE_MULTIPLY,_VARYINGNAME_,ShadeMultiply,_MATRIXNAME_,shadeMultiply,_INFONAME_,ShadeMultiplyInfos.x)
+#include<samplerVertexImplementation>(_DEFINENAME_,SHADING_SHIFT,_VARYINGNAME_,ShadingShift,_MATRIXNAME_,shadingShift,_INFONAME_,ShadingShiftInfos.x)
+#include<samplerVertexImplementation>(_DEFINENAME_,MATCAP,_VARYINGNAME_,Matcap,_MATRIXNAME_,matcap,_INFONAME_,MatcapInfos.x)
+#include<samplerVertexImplementation>(_DEFINENAME_,RIM_MULTIPLY,_VARYINGNAME_,RimMultiply,_MATRIXNAME_,rimMultiply,_INFONAME_,RimMultiplyInfos.x)
+#include<samplerVertexImplementation>(_DEFINENAME_,OUTLINE_WIDTH_MULTIPLY,_VARYINGNAME_,OutlineWidthMultiply,_MATRIXNAME_,outlineWidthMultiply,_INFONAME_,OutlineWidthMultiplyInfos.x)
+#include<samplerVertexImplementation>(_DEFINENAME_,UV_ANIMATION_MASK,_VARYINGNAME_,UvAnimationMask,_MATRIXNAME_,uvAnimationMask,_INFONAME_,UvAnimationMaskInfos.x)

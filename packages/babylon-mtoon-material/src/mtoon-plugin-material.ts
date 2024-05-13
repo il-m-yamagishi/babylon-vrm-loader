@@ -22,6 +22,9 @@ import { Scene } from "@babylonjs/core/scene";
 import type { Nullable } from "@babylonjs/core/types";
 import { MToonMaterialDefines } from "./mtoon-material-defines";
 
+import customVertexDefinitions from "./shaders/custom-vertex-definitions.vert.fx?raw";
+import customVertexMainEnd from "./shaders/custom-vertex-main-end.vert.fx?raw";
+
 /**
  * The rendering mode of outlines
  */
@@ -55,8 +58,6 @@ export enum MToonOutlineWidthMode {
  * @see https://github.com/vrm-c/vrm-specification/blob/master/specification/VRMC_materials_mtoon-1.0/README.md
  */
 export class MToonPluginMaterial extends MaterialPluginBase {
-    private readonly _defines: MToonMaterialDefines;
-
     /**
      * Parent Material
      */
@@ -327,7 +328,6 @@ export class MToonPluginMaterial extends MaterialPluginBase {
         super(material, "MToon", priority ?? 100, defines, true, true, true);
         this._internalMarkAllSubMeshesAsTexturesDirty = material._dirtyCallbacks[Constants.MATERIAL_TextureDirtyFlag];
         this._internalMarkAllSubMeshesAsMiscsDirty = material._dirtyCallbacks[Constants.MATERIAL_MiscDirtyFlag];
-        this._defines = defines;
     }
 
     /**
@@ -583,10 +583,13 @@ export class MToonPluginMaterial extends MaterialPluginBase {
     public override getCustomCode(shaderType: string): Nullable<{ [pointName: string]: string; }> {
         switch (shaderType) {
             case "vertex":
-                break;
+                return {
+                    CUSTOM_VERTEX_DEFINITIONS: customVertexDefinitions,
+                    CUSTOM_VERTEX_MAIN_END: customVertexMainEnd,
+                };
             case "fragment":
                 return {
-                    CUSTOM_FRAGMENT_MAIN_END: 'gl_FragColor = vec4(1., 1., 1., 1.);',
+                    // CUSTOM_FRAGMENT_MAIN_END: 'gl_FragColor = vec4(1., 1., 1., 1.);',
                 }
         }
         return null;

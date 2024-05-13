@@ -8,15 +8,17 @@ import { PointLight } from '@babylonjs/core/Lights/pointLight';
 // import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 // import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
 import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';
+import { PBRMaterial } from '@babylonjs/core/Materials/PBR/pbrMaterial';
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import { Vector3 } from '@babylonjs/core/Maths/math';
-import { CreateSphere } from '@babylonjs/core/Meshes/Builders/sphereBuilder';
-import { CreateTorusKnot } from '@babylonjs/core/Meshes/Builders/torusKnotBuilder';
+import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import { Scene } from '@babylonjs/core/scene';
 import { MToonPluginMaterial } from './src/mtoon-plugin-material';
 
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/inspector';
+import { VertexBuffer } from '@babylonjs/core/Buffers/buffer';
 
 async function createEngine(canvas: HTMLCanvasElement) {
     const debugProperties = getDebugProperties();
@@ -37,12 +39,10 @@ async function main() {
     const engine = await createEngine(canvas);
 
     const scene = new Scene(engine);
-    const camera = new ArcRotateCamera('MainCamera1', 0, 0, 3, new Vector3(0, 1.5, 0), scene, true);
+    const camera = new ArcRotateCamera('MainCamera1', Math.PI * 1.5, 1, 3, new Vector3(0, 1.5, 0), scene, true);
     camera.lowerRadiusLimit = 0.1;
     camera.upperRadiusLimit = 20;
     camera.wheelDeltaPercentage = 0.01;
-    camera.setPosition(new Vector3(0, 1.5, -3));
-    camera.setTarget(new Vector3(0, 1.5, 0));
     camera.attachControl(canvas);
 
     scene.createDefaultEnvironment({
@@ -61,12 +61,8 @@ async function main() {
     const pointLight = new PointLight('PointLight1', new Vector3(0, 0, 1), scene);
     pointLight.setEnabled(false);
 
-    // Meshes
-    const standardMaterialSphere = CreateSphere('StandardMaterialSphere1', {}, scene);
-    standardMaterialSphere.position = new Vector3(1.2, 1.2, 0);
-    standardMaterialSphere.receiveShadows = true;
-
-    const shadowCaster = CreateTorusKnot('ShadowCaster', {}, scene);
+    // Shadows
+    const shadowCaster = MeshBuilder.CreateTorusKnot('ShadowCaster', {}, scene);
     shadowCaster.position = new Vector3(-10.0, 5.0, 0.0);
     shadowCaster.setEnabled(debugProperties.shadow);
     if (debugProperties.shadow) {
@@ -74,12 +70,22 @@ async function main() {
         shadowGenerator.addShadowCaster(shadowCaster);
     }
 
-    const mtoonMaterials: StandardMaterial[] = [];
+    const diffuseTexture = new Texture("http://i.imgur.com/Wk1cGEq.png", scene);
+    diffuseTexture.uScale = 4;
+    diffuseTexture.vScale = 4;
+
+    const bumpTexture = new Texture("http://i.imgur.com/wGyk6os.png", scene);
+    bumpTexture.uScale = 4;
+    bumpTexture.vScale = 4;
+
+    const standardMaterials: StandardMaterial[] = [];
     {
         const mat = new StandardMaterial("MToonMaterial1", scene);
-        const plugin = new MToonPluginMaterial(mat, "MToonMaterial1", 0);
-        // mat.outlineWidthMode = 1;
-        mtoonMaterials.push(mat);
+        const plugin = new MToonPluginMaterial(mat);
+        mat.diffuseTexture = diffuseTexture;
+        mat.bumpTexture = bumpTexture;
+        plugin.shadeMultiplyTexture = diffuseTexture;
+        standardMaterials.push(mat);
     }
     // {
     //     const mat = new MToonMaterial('MtoonMaterialNormal', scene);
@@ -189,29 +195,45 @@ async function main() {
     //     mtoonMaterials.push(mat);
     // }
 
-    mtoonMaterials.forEach((mat, index) => {
+    standardMaterials.forEach((mat, index) => {
         // Right-coordinates for glTF
         // mat.cullMode = 1;
-        const sphere = CreateSphere(`${mat.name}_Sphere`, {}, scene);
-        sphere.position = new Vector3(-1.2 * index, 1.2, 0);
+        const sphere = MeshBuilder.CreateSphere(`${mat.name}_Sphere`, {}, scene);
+        sphere.position = new Vector3(-1.2 * index, 1, 0);
         sphere.receiveShadows = true;
         sphere.material = mat;
     });
 
-    // {
-    //     // No Normal
-    //     const mat = new MToonMaterial('MToonMaterialNoNormal', scene);
-    //     mat.cullMode = 1;
-    //     mat.outlineCullMode = 2;
-    //     mat.outlineWidthMode = 1;
-    //     const sphere = CreateSphere('MToonMaterialNoNormal_Sphere', {}, scene);
-    //     sphere.position = new Vector3(2.4, 1.2, 0);
-    //     sphere.receiveShadows = true;
-    //     sphere.material = mat;
-    //     if (sphere.geometry) {
-    //         sphere.geometry.removeVerticesData(VertexBuffer.NormalKind);
-    //     }
-    // }
+    // PBRMaterials
+    const pbrMaterials: PBRMaterial[] = [];
+    {
+        const mat = new PBRMaterial("PBRMaterial1", scene);
+        const plugin = new MToonPluginMaterial(mat);
+        mat.albedoTexture = diffuseTexture;
+        mat.bumpTexture = bumpTexture;
+        plugin.shadeMultiplyTexture = diffuseTexture;
+        pbrMaterials.push(mat);
+    }
+
+    pbrMaterials.forEach((mat, index) => {
+        const sphere = MeshBuilder.CreateSphere(`${mat.name}_Sphere_${index}`, {}, scene);
+        sphere.position = new Vector3(-1.2 * index, 1, 1.5);
+        sphere.receiveShadows = true;
+        sphere.material = mat;
+    });
+
+    {
+        // No Normal
+        const mat = new StandardMaterial('MToonMaterialNoNormal', scene);
+        new MToonPluginMaterial(mat);
+        const sphere = MeshBuilder.CreateSphere('MToonMaterialNoNormal_Sphere', {}, scene);
+        sphere.position = new Vector3(1.2, 1, 0);
+        sphere.receiveShadows = true;
+        sphere.material = mat;
+        if (sphere.geometry) {
+            sphere.geometry.removeVerticesData(VertexBuffer.NormalKind);
+        }
+    }
 
     if (debugProperties.inspector) {
         await scene.debugLayer.show({
