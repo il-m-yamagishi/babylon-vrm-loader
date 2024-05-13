@@ -11,10 +11,11 @@ import { Vector3 } from '@babylonjs/core/Maths/math';
 import { CreateSphere } from '@babylonjs/core/Meshes/Builders/sphereBuilder';
 import { CreateTorusKnot } from '@babylonjs/core/Meshes/Builders/torusKnotBuilder';
 import { Scene } from '@babylonjs/core/scene';
-import { MToonMaterial } from './src/mtoon-material';
+import { MToonMaterialPlugin } from './src/mtoon-material-plugin';
 
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/inspector';
+import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 
 async function main() {
     const debugProperties = getDebugProperties();
@@ -62,10 +63,11 @@ async function main() {
         shadowGenerator.addShadowCaster(shadowCaster);
     }
 
-    const mtoonMaterials: MToonMaterial[] = [];
+    const mtoonMaterials: StandardMaterial[] = [];
     {
-        const mat = new MToonMaterial('MtoonMaterialDefault', scene);
-        mat.outlineWidthMode = 1;
+        const mat = new StandardMaterial("MToonMaterial1", scene);
+        const plugin = new MToonMaterialPlugin(mat, "MToonMaterial1", 0);
+        // mat.outlineWidthMode = 1;
         mtoonMaterials.push(mat);
     }
     // {
@@ -178,7 +180,7 @@ async function main() {
 
     mtoonMaterials.forEach((mat, index) => {
         // Right-coordinates for glTF
-        mat.cullMode = 1;
+        // mat.cullMode = 1;
         const sphere = CreateSphere(`${mat.name}_Sphere`, {}, scene);
         sphere.position = new Vector3(-1.2 * index, 1.2, 0);
         sphere.receiveShadows = true;
