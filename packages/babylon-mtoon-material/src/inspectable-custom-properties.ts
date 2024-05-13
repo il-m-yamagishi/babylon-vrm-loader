@@ -1,3 +1,9 @@
+/**
+ * Babylon.js MToonMaterial Inspector Custom Properties
+ * @license MIT
+ * @author Masaru Yamagishi
+ */
+
 import type { IInspectable } from '@babylonjs/core/Misc/iInspectable';
 import { InspectableType } from '@babylonjs/core/Misc/iInspectable';
 

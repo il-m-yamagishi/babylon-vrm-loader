@@ -1,19 +1,10 @@
 # babylon-vrm-loader
 
-[![npm version](https://badge.fury.io/js/babylon-vrm-loader.svg)](https://badge.fury.io/js/babylon-vrm-loader) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
+[![npm version](https://badge.fury.io/js/@m-yamagishi/babylon-vrm-loader.svg)](https://badge.fury.io/js/@m-yamagishi/babylon-vrm-loader) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
 
 ![alicia.png](packages/babylon-vrm-loader/alicia.png)
 
 VRM porting to babylon.js.
-
-## Supported version table
-
-|babylon.js version|babylon-vrm-loader version|
-|---|---|
-|~4.1.0|<1.5.0|
-|~4.2.0|^1.5.0|
-|^5.19.0|^2.0.0|
-|^6.0.0|will be ^3.0.0|
 
 ## Features
 

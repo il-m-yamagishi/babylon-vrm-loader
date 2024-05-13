@@ -1,6 +1,11 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+/**
+ * Babylon.js MToon Material Defines
+ * @license MIT
+ * @author Masaru Yamagishi
+ */
+
 import { MaterialDefines } from '@babylonjs/core/Materials/materialDefines';
-import type { IImageProcessingConfigurationDefines } from '@babylonjs/core/Materials/imageProcessingConfiguration';
+import type { IImageProcessingConfigurationDefines } from '@babylonjs/core/Materials/imageProcessingConfiguration.defines';
 
 /**
  * Material Defines

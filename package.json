@@ -1,0 +1,22 @@
+{
+    "name": "@m-yamagishi/root",
+    "version": "1.0.0",
+    "private": true,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/il-m-yamagishi/babylon-vrm-loader"
+    },
+    "workspaces": [
+        "packages/*"
+    ],
+    "engines": {
+        "node": ">=20.0.0",
+        "npm": ">=10.0.0"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "1.7.3",
+        "@types/node": "^20.0.0",
+        "semantic-release": "^23.1.1",
+        "semantic-release-monorepo": "^8.0.2"
+    }
+}

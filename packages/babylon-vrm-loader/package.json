@@ -1,6 +1,6 @@
 {
-    "name": "babylon-vrm-loader",
-    "version": "2.0.0",
+    "name": "@m-yamagishi/babylon-vrm-loader",
+    "version": "0.0.0",
     "description": "babylon.js VRM Loader",
     "license": "MIT",
     "author": {
@@ -10,7 +10,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/virtual-cast/babylon-vrm-loader.git"
+        "url": "https://github.com/il-m-yamagishi/babylon-vrm-loader.git"
     },
     "keywords": [
         "babylon.js",
@@ -23,36 +23,16 @@
     "typings": "dist/index.d.ts",
     "main": "dist/index.module.js",
     "dependencies": {
-        "babylon-mtoon-material": "^5.0.0"
     },
     "devDependencies": {
-        "@babylonjs/core": "^5.19.0",
-        "@babylonjs/gui": "^5.19.0",
-        "@babylonjs/gui-editor": "^5.19.0",
-        "@babylonjs/inspector": "^5.19.0",
-        "@babylonjs/loaders": "^5.19.0",
-        "@babylonjs/materials": "^5.19.0",
-        "@babylonjs/serializers": "^5.19.0",
-        "@semantic-release/git": "^10.0.1",
-        "@types/node": "^15.12.2",
-        "@typescript-eslint/eslint-plugin": "~5.16.0",
-        "@typescript-eslint/parser": "~5.16.0",
-        "babylonjs-gltf2interface": "^5.0.0",
-        "cz-conventional-changelog": "3.3.0",
-        "eslint": "^8.11.0",
-        "eslint-config-prettier": "~8.5.0",
-        "eslint-plugin-import": "~2.26.0",
-        "eslint-plugin-prettier": "~4.0.0",
-        "gh-pages": "^4.0.0",
-        "prettier": "^2.7.1",
-        "semantic-release": "^19.0.3",
-        "ts-loader": "^9.2.6",
-        "tslib": "^2.4.0",
-        "typescript": "~4.6.2",
-        "webpack": "^5.73.0",
-        "webpack-cli": "^4.10.0",
-        "webpack-dev-server": "^4.9.3",
-        "webpack-merge": "^5.8.0"
+        "@babylonjs/core": "^7.0.0",
+        "@babylonjs/gui": "^7.0.0",
+        "@babylonjs/inspector": "^7.0.0",
+        "@babylonjs/loaders": "^7.0.0",
+        "@babylonjs/serializers": "^7.0.0",
+        "babylonjs-gltf2interface": "^7.0.0",
+        "typescript": "~5.4.5",
+        "vite": "^5.2.11"
     },
     "scripts": {
         "build": "webpack",
@@ -99,7 +79,8 @@
         ]
     },
     "peerDependencies": {
-        "@babylonjs/core": "^5.19.0",
-        "@babylonjs/loaders": "^5.19.0"
+        "@babylonjs/core": "^7.0.0",
+        "@babylonjs/loaders": "^7.0.0",
+        "@m-yamagishi/babylon-mtoon-material": "*"
     }
 }

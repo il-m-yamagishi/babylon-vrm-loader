@@ -1,14 +1,15 @@
+// import { VertexBuffer } from '@babylonjs/core/Buffers/buffer';
 import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera';
 import { Engine } from '@babylonjs/core/Engines/engine';
+import { ShadowGenerator } from '@babylonjs/core/Lights/Shadows/shadowGenerator';
 import { DirectionalLight } from '@babylonjs/core/Lights/directionalLight';
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
 import { PointLight } from '@babylonjs/core/Lights/pointLight';
-import { ShadowGenerator } from '@babylonjs/core/Lights/Shadows/shadowGenerator';
-import { Texture } from '@babylonjs/core/Materials/Textures/texture';
-import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
+// import { Texture } from '@babylonjs/core/Materials/Textures/texture';
+// import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
+import { Vector3 } from '@babylonjs/core/Maths/math';
 import { CreateSphere } from '@babylonjs/core/Meshes/Builders/sphereBuilder';
 import { CreateTorusKnot } from '@babylonjs/core/Meshes/Builders/torusKnotBuilder';
-import { VertexBuffer } from '@babylonjs/core/Buffers/buffer';
 import { Scene } from '@babylonjs/core/scene';
 import { MToonMaterial } from './src/mtoon-material';
 

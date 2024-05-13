@@ -1,6 +1,6 @@
 {
-    "name": "babylon-mtoon-material",
-    "version": "5.1.1",
+    "name": "@m-yamagishi/babylon-mtoon-material",
+    "version": "0.0.0",
     "description": "Unity MToon Shader WebGL porting with babylon.js",
     "license": "MIT",
     "author": {
@@ -10,7 +10,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/il-m-yamagishi/babylon-mtoon-material.git"
+        "url": "https://github.com/il-m-yamagishi/babylon-vrm-loader.git"
     },
     "keywords": [
         "babylon.js",
@@ -26,18 +26,18 @@
     "typings": "dist/index.d.ts",
     "main": "dist/index.module.js",
     "devDependencies": {
-        "@babylonjs/core": "^6.0.0",
-        "@babylonjs/inspector": "^6.0.0",
-        "babylonjs-gltf2interface": "^6.0.0",
-        "typescript": "~5.2.2",
-        "vite": "^5.0.0"
+        "@babylonjs/core": "^7.0.0",
+        "@babylonjs/inspector": "^7.0.0",
+        "babylonjs-gltf2interface": "^7.0.0",
+        "typescript": "~5.4.5",
+        "vite": "^5.2.11"
     },
     "peerDependencies": {
-        "@babylonjs/core": "^6.0.0"
+        "@babylonjs/core": "^7.0.0"
     },
     "scripts": {
         "dev": "vite",
-        "build": "tsc && vite build"
+        "build": "vite build"
     },
     "config": {
         "commitizen": {

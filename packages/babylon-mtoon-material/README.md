@@ -1,6 +1,6 @@
 # babylon-mtoon-material
 
-[![npm version](https://badge.fury.io/js/babylon-mtoon-material.svg)](https://badge.fury.io/js/babylon-mtoon-material) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ![](mtoon.png)
 
@@ -9,17 +9,6 @@
 Some settings will be ignored or generates inconsistent lighting.
 
 [About MToon](https://vrm.dev/en/univrm/shaders/shader_mtoon)([ja](https://vrm.dev/univrm/shaders/shader_mtoon))
-
-## Supported version table
-
-|babylon.js version|babylon-mtoon-material version|
-|---|---|
-|~4.0.0|^1.0.0|
-|~4.1.0|^2.0.0|
-|~4.2.0|^3.0.0|
-|~5.0.0-rc.0|^4.0.0|
-|^5.19.0|^5.0.0|
-|^6.0.0|^6.0.0|
 
 ## Features
 
@@ -78,7 +67,10 @@ $ npm run build
 
 ### Debugging MToonMaterial
 
-TODO
+```s
+$ npm ci
+$ npm run dev
+```
 
 ### Test
 

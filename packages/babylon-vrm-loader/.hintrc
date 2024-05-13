@@ -1,9 +1,0 @@
-{
-    "extends": [
-        "accessibility",
-        "progressive-web-apps"
-    ],
-    "hints": {
-        "typescript-config/strict": "off"
-    }
-}

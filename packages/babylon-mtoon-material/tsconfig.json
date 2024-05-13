@@ -6,8 +6,10 @@
         "target": "es2021",
         "declaration": true,
         "sourceMap": true,
+        "inlineSources": true,
         "experimentalDecorators": true,
         "noImplicitAny": true,
+        "noImplicitOverride": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "noUnusedLocals": true,
@@ -21,17 +23,11 @@
             "ES2017"
         ],
         "outDir": "dist",
-        "strictPropertyInitialization": false,
-        "allowImportingTsExtensions": true,
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "noEmit": true,
-        "strict": true,
-        "noFallthroughCasesInSwitch": true
+        "types": ["vite/client"]
     },
     "include": [
         "src",
-        "./index.d.ts",
+        "src/index.d.ts",
         "index.ts",
     ]
 }

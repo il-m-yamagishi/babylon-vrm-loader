@@ -1,5 +1,0 @@
-[*.yml]
-indent_size = 2
-
-[*.{frag,vert}]
-end_of_line = lf
