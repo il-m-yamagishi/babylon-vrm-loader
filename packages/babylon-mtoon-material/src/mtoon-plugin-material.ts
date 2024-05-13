@@ -4,20 +4,23 @@
  * @author Masaru Yamagishi
  */
 
+import type { IAnimatable } from "@babylonjs/core/Animations/animatable.interface";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
 import { Material } from "@babylonjs/core/Materials/material";
+import { BindTextureMatrix, PrepareDefinesForMergedUV } from "@babylonjs/core/Materials/materialHelper.functions";
 import { MaterialPluginBase } from "@babylonjs/core/Materials/materialPluginBase";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { SubMesh } from "@babylonjs/core/Meshes/subMesh";
 import { expandToProperty, serialize, serializeAsColor3, serializeAsTexture } from "@babylonjs/core/Misc/decorators";
+import { Scene } from "@babylonjs/core/scene";
 import type { Nullable } from "@babylonjs/core/types";
 import { MToonMaterialDefines } from "./mtoon-material-defines";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { AbstractMesh, IAnimatable, MaterialDefines, UniformBuffer } from "@babylonjs/core";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { SubMesh } from "@babylonjs/core/Meshes/subMesh";
-import { Scene } from "@babylonjs/core/scene";
 
 /**
  * The rendering mode of outlines
@@ -145,6 +148,13 @@ export class MToonPluginMaterial extends MaterialPluginBase {
     public shadingShiftTexture: Nullable<BaseTexture> = null;
 
     /**
+     * The scalar parameter which specifies the contribution of the texture to the shading shift value.
+     * This value is interpreted as a linear value.
+     */
+    @serialize()
+    public shadingShiftTextureScale = 1.0;
+
+    /**
      * The factor which adjusts the width of shading boundary
      * See the section [Shading Shift](https://github.com/vrm-c/vrm-specification/blob/master/specification/VRMC_materials_mtoon-1.0/README.md#Shading%20Shift) for specific details on how the calculation is performed.
      */
@@ -222,6 +232,7 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      * See the section [Outline](https://github.com/vrm-c/vrm-specification/blob/master/specification/VRMC_materials_mtoon-1.0/README.md#Outline) for specific details of the outline rendering procedure.
      */
     @serialize()
+    @expandToProperty("_markAllSubMeshesAsMiscsDirty")
     public outlineWidthMode: MToonOutlineWidthMode = MToonOutlineWidthMode.None;
 
     /**
@@ -297,6 +308,17 @@ export class MToonPluginMaterial extends MaterialPluginBase {
         }
     }
 
+    /** @internal */
+    private _internalMarkAllSubMeshesAsMiscsDirty: () => void;
+
+    /** @internal */
+    public _markAllSubMeshesAsMiscsDirty(): void {
+        this._enable(this._isEnabled);
+        if (this._internalMarkAllSubMeshesAsMiscsDirty) {
+            this._internalMarkAllSubMeshesAsMiscsDirty();
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -304,6 +326,7 @@ export class MToonPluginMaterial extends MaterialPluginBase {
         const defines = new MToonMaterialDefines();
         super(material, "MToon", priority ?? 100, defines, true, true, true);
         this._internalMarkAllSubMeshesAsTexturesDirty = material._dirtyCallbacks[Constants.MATERIAL_TextureDirtyFlag];
+        this._internalMarkAllSubMeshesAsMiscsDirty = material._dirtyCallbacks[Constants.MATERIAL_MiscDirtyFlag];
         this._defines = defines;
     }
 
@@ -316,7 +339,7 @@ export class MToonPluginMaterial extends MaterialPluginBase {
         }
 
         if (defines._areTexturesDirty && scene.texturesEnabled) {
-            if (this.textures.find((texture) => !texture.isReady())) {
+            if (this.textures.find((texture) => !texture.isReadyOrNotBlocking())) {
                 return false;
             }
         }
@@ -329,8 +352,63 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      */
     public override prepareDefines(defines: MToonMaterialDefines, scene: Scene, mesh: AbstractMesh): void {
         if (this._isEnabled) {
-            // TODO
+            if (defines._areMiscDirty) {
+                switch (this.outlineWidthMode) {
+                    case MToonOutlineWidthMode.None:
+                        defines.MTOON_OUTLINE_WIDTH_WORLD = false;
+                        defines.MTOON_OUTLINE_WIDTH_SCREEN = false;
+                        break;
+                    case MToonOutlineWidthMode.WorldCoordinates:
+                        defines.MTOON_OUTLINE_WIDTH_WORLD = true;
+                        defines.MTOON_OUTLINE_WIDTH_SCREEN = false;
+                        defines._needNormals = true;
+                        break;
+                    case MToonOutlineWidthMode.ScreenCoordinates:
+                        defines.MTOON_OUTLINE_WIDTH_WORLD = false;
+                        defines.MTOON_OUTLINE_WIDTH_SCREEN = true;
+                        defines._needNormals = true;
+                        break;
+                }
+            }
+
+            if (defines._areTexturesDirty && scene.texturesEnabled) {
+                // Update Texture defines
+                if (this.shadeMultiplyTexture) {
+                    PrepareDefinesForMergedUV(this.shadeMultiplyTexture, defines, "SHADE_MULTIPLY");
+                } else {
+                    defines.SHADE_MULTIPLY = false;
+                }
+                if (this.shadingShiftTexture) {
+                    PrepareDefinesForMergedUV(this.shadingShiftTexture, defines, "SHADING_SHIFT");
+                } else {
+                    defines.SHADING_SHIFT = false;
+                }
+                if (this.matcapTexture) {
+                    PrepareDefinesForMergedUV(this.matcapTexture, defines, "MATCAP");
+                } else {
+                    defines.MATCAP = false;
+                }
+                if (this.rimMultiplyTexture) {
+                    PrepareDefinesForMergedUV(this.rimMultiplyTexture, defines, "RIM_MULTIPLY");
+                } else {
+                    defines.RIM_MULTIPLY = false;
+                }
+                if (this.outlineWidthMultiplyTexture) {
+                    PrepareDefinesForMergedUV(this.outlineWidthMultiplyTexture, defines, "OUTLINE_WIDTH_MULTIPLY");
+                } else {
+                    defines.OUTLINE_WIDTH_MULTIPLY = false;
+                }
+                if (this.uvAnimationMaskTexture) {
+                    PrepareDefinesForMergedUV(this.uvAnimationMaskTexture, defines, "UV_ANIMATION_MASK");
+                } else {
+                    defines.UV_ANIMATION_MASK = false;
+                }
+            }
         } else {
+            defines.MTOON_OUTLINE_WIDTH_WORLD = false;
+            defines.MTOON_OUTLINE_WIDTH_SCREEN = false;
+
+            // Disable texture defines
             defines.SHADE_MULTIPLY = false;
             defines.SHADING_SHIFT = false;
             defines.MATCAP = false;
@@ -348,7 +426,69 @@ export class MToonPluginMaterial extends MaterialPluginBase {
             return;
         }
 
-        // TODO
+        if (!uniformBuffer.useUbo || !this._material.isFrozen || !uniformBuffer.isSync) {
+            if (this.shadeMultiplyTexture) {
+                uniformBuffer.updateFloat2("vShadeMultiplyInfos", this.shadeMultiplyTexture.coordinatesIndex, this.shadeMultiplyTexture.level);
+                BindTextureMatrix(this.shadeMultiplyTexture, uniformBuffer, "shadeMultiply");
+            }
+            if (this.shadingShiftTexture) {
+                uniformBuffer.updateFloat3("vShadingShiftInfos", this.shadingShiftTexture.coordinatesIndex, this.shadingShiftTexture.level, this.shadingShiftTextureScale);
+                BindTextureMatrix(this.shadingShiftTexture, uniformBuffer, "shadingShift");
+            }
+            if (this.matcapTexture) {
+                uniformBuffer.updateFloat2("vMatcapInfos", this.matcapTexture.coordinatesIndex, this.matcapTexture.level);
+                BindTextureMatrix(this.matcapTexture, uniformBuffer, "matcap");
+            }
+            if (this.rimMultiplyTexture) {
+                uniformBuffer.updateFloat2("vRimMultiplyInfos", this.rimMultiplyTexture.coordinatesIndex, this.rimMultiplyTexture.level);
+                BindTextureMatrix(this.rimMultiplyTexture, uniformBuffer, "rimMultiply");
+            }
+            if (this.outlineWidthMultiplyTexture) {
+                uniformBuffer.updateFloat2("vOutlineWidthMultiplyInfos", this.outlineWidthMultiplyTexture.coordinatesIndex, this.outlineWidthMultiplyTexture.level);
+                BindTextureMatrix(this.outlineWidthMultiplyTexture, uniformBuffer, "outlineWidthMultiply");
+            }
+            if (this.uvAnimationMaskTexture) {
+                uniformBuffer.updateFloat2("vUvAnimationMaskInfos", this.uvAnimationMaskTexture.coordinatesIndex, this.uvAnimationMaskTexture.level);
+                BindTextureMatrix(this.uvAnimationMaskTexture, uniformBuffer, "uvAnimationMask");
+            }
+        }
+
+        if (scene.texturesEnabled) {
+            if (this.shadeMultiplyTexture) {
+                uniformBuffer.setTexture("shadeMultiplySampler", this.shadeMultiplyTexture);
+            }
+            if (this.shadingShiftTexture) {
+                uniformBuffer.setTexture("shadingShiftSampler", this.shadingShiftTexture);
+            }
+            if (this.matcapTexture) {
+                uniformBuffer.setTexture("matcapSampler", this.matcapTexture);
+            }
+            if (this.rimMultiplyTexture) {
+                uniformBuffer.setTexture("rimMultiplySampler", this.rimMultiplyTexture);
+            }
+            if (this.outlineWidthMultiplyTexture) {
+                uniformBuffer.setTexture("outlineWidthMultiplySampler", this.outlineWidthMultiplyTexture);
+            }
+            if (this.uvAnimationMaskTexture) {
+                uniformBuffer.setTexture("uvAnimationMaskSampler", this.uvAnimationMaskTexture);
+            }
+        }
+
+        uniformBuffer.updateColor3("shadeColorFactor", this.shadeColorFactor);
+        uniformBuffer.updateFloat("shadingShiftFactor", this.shadingShiftFactor);
+        uniformBuffer.updateFloat("shadingToonyFactor", this.shadingToonyFactor);
+        uniformBuffer.updateFloat("giEqualizationFactor", this.giEqualizationFactor);
+        uniformBuffer.updateColor3("matcapFactor", this.matcapFactor);
+        uniformBuffer.updateColor3("parametricRimColorFactor", this.parametricRimColorFactor);
+        uniformBuffer.updateFloat("parametricRimFresnelPowerFactor", this.parametricRimFresnelPowerFactor);
+        uniformBuffer.updateFloat("parametricRimLiftFactor", this.parametricRimLiftFactor);
+        uniformBuffer.updateFloat("rimLightingMixFactor", this.rimLightingMixFactor);
+        uniformBuffer.updateFloat("outlineWidthFactor", this.outlineWidthFactor);
+        uniformBuffer.updateColor3("outlineColorFactor", this.outlineColorFactor);
+        uniformBuffer.updateFloat("outlineLightingMixFactor", this.outlineLightingMixFactor);
+        uniformBuffer.updateFloat("uvAnimationScrollXSpeedFactor", this.uvAnimationScrollXSpeedFactor);
+        uniformBuffer.updateFloat("uvAnimationScrollYSpeedFactor", this.uvAnimationScrollYSpeedFactor);
+        uniformBuffer.updateFloat("uvAnimationScrollRotationSpeedFactor", this.uvAnimationScrollRotationSpeedFactor);
     }
 
     /**
@@ -391,27 +531,64 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      * @inheritdoc
      */
     public override getSamplers(samplers: string[]): void {
-        samplers.push("shadeMultiply");
-        samplers.push("shadingShift");
-        samplers.push("matcap");
-        samplers.push("rimMultiply");
-        samplers.push("outlineWidthMultiply");
-        samplers.push("uvAnimationMask");
+        samplers.push("shadeMultiplySampler");
+        samplers.push("shadingShiftSampler");
+        samplers.push("matcapSampler");
+        samplers.push("rimMultiplySampler");
+        samplers.push("outlineWidthMultiplySampler");
+        samplers.push("uvAnimationMaskSampler");
     }
 
     /**
      * @inheritdoc
      */
     public override getUniforms(): { ubo?: { name: string; size?: number | undefined; type?: string | undefined; arraySize?: number | undefined; }[] | undefined; vertex?: string | undefined; fragment?: string | undefined; } {
-        // TODO
-        return {};
+        return {
+            ubo: [
+                { name: "shadeColorFactor", size: 3, type: "vec3" },
+                { name: "vShadeMultiplyInfos", size: 2, type: "vec2" },
+                { name: "shadeMultiplyMatrix", size: 16, type: "mat4" },
+                { name: "shadingShiftFactor", size: 1, type: "float" },
+                { name: "vShadingShiftInfos", size: 3, type: "vec3" },
+                { name: "shadingShiftMatrix", size: 16, type: "mat2" },
+                { name: "shadingToonyFactor", size: 1, type: "float" },
+                { name: "giEqualizationFactor", size: 1, type: "float" },
+                { name: "matcapFactor", size: 3, type: "vec3" },
+                { name: "vMatcapInfos", size: 2, type: "vec2" },
+                { name: "matcapMatrix", size: 16, type: "mat4" },
+                { name: "parametricRimColorFactor", size: 3, type: "vec3" },
+                { name: "parametricRimFresnelPowerFactor", size: 1, type: "float" },
+                { name: "parametricRimLiftFactor", size: 1, type: "float" },
+                { name: "vRimMultiplyInfos", size: 2, type: "vec2" },
+                { name: "rimMultiplyMatrix", size: 16, type: "mat4" },
+                { name: "rimLightingMixFactor", size: 1, type: "float" },
+                { name: "outlineWidthMode", size: 1, type: "float" },
+                { name: "outlineWidthFactor", size: 1, type: "float" },
+                { name: "vOutlineWidthMultiplyInfos", size: 2, type: "vec2" },
+                { name: "outlineWidthMultiplyMatrix", size: 16, type: "mat4" },
+                { name: "outlineColorFactor", size: 3, type: "vec3" },
+                { name: "outlineLightingMixFactor", size: 1, type: "float" },
+                { name: "vUvAnimationMaskInfos", size: 2, type: "vec2" },
+                { name: "uvAnimationMaskMatrix", size: 16, type: "mat4" },
+                { name: "uvAnimationScrollXSpeedFactor", size: 1, type: "float" },
+                { name: "uvAnimationScrollYSpeedFactor", size: 1, type: "float" },
+                { name: "uvAnimationScrollRotationSpeedFactor", size: 1, type: "float" },
+            ],
+        };
     }
 
     /**
      * @inheritdoc
      */
     public override getCustomCode(shaderType: string): Nullable<{ [pointName: string]: string; }> {
-        // TODO
+        switch (shaderType) {
+            case "vertex":
+                break;
+            case "fragment":
+                return {
+                    CUSTOM_FRAGMENT_MAIN_END: 'gl_FragColor = vec4(1., 1., 1., 1.);',
+                }
+        }
         return null;
     }
 

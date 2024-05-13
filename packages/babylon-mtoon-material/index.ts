@@ -7,6 +7,8 @@ import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
 import { PointLight } from '@babylonjs/core/Lights/pointLight';
 // import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 // import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
+import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';
+import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import { Vector3 } from '@babylonjs/core/Maths/math';
 import { CreateSphere } from '@babylonjs/core/Meshes/Builders/sphereBuilder';
 import { CreateTorusKnot } from '@babylonjs/core/Meshes/Builders/torusKnotBuilder';
@@ -15,15 +17,24 @@ import { MToonPluginMaterial } from './src/mtoon-plugin-material';
 
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/inspector';
-import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
+
+async function createEngine(canvas: HTMLCanvasElement) {
+    const debugProperties = getDebugProperties();
+    if (debugProperties.webgpu && await WebGPUEngine.IsSupportedAsync) {
+        const engine = new WebGPUEngine(canvas);
+        await engine.initAsync();
+        return engine;
+    }
+    return new Engine(canvas, true, {
+        alpha: false,
+        disableWebGL2Support: debugProperties.webgl1,
+    });
+}
 
 async function main() {
     const debugProperties = getDebugProperties();
     const canvas = document.getElementById('main-canvas') as HTMLCanvasElement;
-    const engine = new Engine(canvas, true, {
-        alpha: false,
-        disableWebGL2Support: debugProperties.webgl1,
-    });
+    const engine = await createEngine(canvas);
 
     const scene = new Scene(engine);
     const camera = new ArcRotateCamera('MainCamera1', 0, 0, 3, new Vector3(0, 1.5, 0), scene, true);
@@ -221,6 +232,7 @@ async function main() {
 
 interface DebugProperties {
     webgl1: boolean;
+    webgpu: boolean;
     shadow: boolean;
     inspector: boolean;
 }
@@ -230,6 +242,7 @@ function getDebugProperties(): DebugProperties {
 
     return {
         webgl1: href.includes('webgl1'),
+        webgpu: href.includes('webgpu'),
         shadow: href.includes('shadow'),
         inspector: href.includes('inspector'),
     };

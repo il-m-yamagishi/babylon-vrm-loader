@@ -16,8 +16,6 @@ export class MToonMaterialDefines extends MaterialDefines {
     // MToon Specific
     public MTOON_OUTLINE_WIDTH_WORLD = false;
     public MTOON_OUTLINE_WIDTH_SCREEN = false;
-    public MTOON_OUTLINE_COLOR_FIXED = false;
-    public MTOON_OUTLINE_COLOR_MIXED = false;
     public MTOON_DEBUG_NORMAL = false;
     public MTOON_DEBUG_LITSHADERRATE = false;
 
