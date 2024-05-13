@@ -29,6 +29,7 @@
         "@babylonjs/core": "^7.0.0",
         "@babylonjs/inspector": "^7.0.0",
         "babylonjs-gltf2interface": "^7.0.0",
+        "tslib": "^2.6.2",
         "typescript": "~5.4.5",
         "vite": "^5.2.11"
     },

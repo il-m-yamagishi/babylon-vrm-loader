@@ -11,7 +11,7 @@ import { Vector3 } from '@babylonjs/core/Maths/math';
 import { CreateSphere } from '@babylonjs/core/Meshes/Builders/sphereBuilder';
 import { CreateTorusKnot } from '@babylonjs/core/Meshes/Builders/torusKnotBuilder';
 import { Scene } from '@babylonjs/core/scene';
-import { MToonMaterialPlugin } from './src/mtoon-material-plugin';
+import { MToonPluginMaterial } from './src/mtoon-plugin-material';
 
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/inspector';
@@ -66,7 +66,7 @@ async function main() {
     const mtoonMaterials: StandardMaterial[] = [];
     {
         const mat = new StandardMaterial("MToonMaterial1", scene);
-        const plugin = new MToonMaterialPlugin(mat, "MToonMaterial1", 0);
+        const plugin = new MToonPluginMaterial(mat, "MToonMaterial1", 0);
         // mat.outlineWidthMode = 1;
         mtoonMaterials.push(mat);
     }
