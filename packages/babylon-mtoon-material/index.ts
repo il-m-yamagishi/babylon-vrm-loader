@@ -11,7 +11,7 @@ import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';
 import { PBRMaterial } from '@babylonjs/core/Materials/PBR/pbrMaterial';
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
-import { Vector3 } from '@babylonjs/core/Maths/math';
+import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
 import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import { Scene } from '@babylonjs/core/scene';
 import { MToonPluginMaterial } from './src/mtoon-plugin-material';
@@ -59,7 +59,7 @@ async function main() {
     const hemisphericLight = new HemisphericLight('HemisphericLight1', new Vector3(-0.2, -0.8, -1), scene);
     hemisphericLight.setEnabled(false);
     const pointLight = new PointLight('PointLight1', new Vector3(0, 0, 1), scene);
-    pointLight.setEnabled(false);
+    pointLight.setEnabled(true);
 
     // Shadows
     const shadowCaster = MeshBuilder.CreateTorusKnot('ShadowCaster', {}, scene);
@@ -81,6 +81,7 @@ async function main() {
     const standardMaterials: StandardMaterial[] = [];
     {
         const mat = new StandardMaterial("MToonMaterial1", scene);
+        // mat.specularColor = Color3.Black();
         const plugin = new MToonPluginMaterial(mat);
         mat.diffuseTexture = diffuseTexture;
         mat.bumpTexture = bumpTexture;
@@ -200,24 +201,6 @@ async function main() {
         // mat.cullMode = 1;
         const sphere = MeshBuilder.CreateSphere(`${mat.name}_Sphere`, {}, scene);
         sphere.position = new Vector3(-1.2 * index, 1, 0);
-        sphere.receiveShadows = true;
-        sphere.material = mat;
-    });
-
-    // PBRMaterials
-    const pbrMaterials: PBRMaterial[] = [];
-    {
-        const mat = new PBRMaterial("PBRMaterial1", scene);
-        const plugin = new MToonPluginMaterial(mat);
-        mat.albedoTexture = diffuseTexture;
-        mat.bumpTexture = bumpTexture;
-        plugin.shadeMultiplyTexture = diffuseTexture;
-        pbrMaterials.push(mat);
-    }
-
-    pbrMaterials.forEach((mat, index) => {
-        const sphere = MeshBuilder.CreateSphere(`${mat.name}_Sphere_${index}`, {}, scene);
-        sphere.position = new Vector3(-1.2 * index, 1, 1.5);
         sphere.receiveShadows = true;
         sphere.material = mat;
     });

@@ -7,7 +7,6 @@
 import type { IAnimatable } from "@babylonjs/core/Animations/animatable.interface";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
 import { Material } from "@babylonjs/core/Materials/material";
 import { BindTextureMatrix, PrepareDefinesForMergedUV } from "@babylonjs/core/Materials/materialHelper.functions";
@@ -22,6 +21,7 @@ import { Scene } from "@babylonjs/core/scene";
 import type { Nullable } from "@babylonjs/core/types";
 import { MToonMaterialDefines } from "./mtoon-material-defines";
 
+import customFragmentDefinitions from "./shaders/custom-fragment-definitions.frag.fx?raw";
 import customVertexDefinitions from "./shaders/custom-vertex-definitions.vert.fx?raw";
 import customVertexMainEnd from "./shaders/custom-vertex-main-end.vert.fx?raw";
 
@@ -61,7 +61,7 @@ export class MToonPluginMaterial extends MaterialPluginBase {
     /**
      * Parent Material
      */
-    protected override readonly _material: PBRMaterial | StandardMaterial;
+    protected override readonly _material: StandardMaterial;
 
     @serialize()
     public override readonly name = "MToonPluginMaterial";
@@ -324,6 +324,9 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      * @inheritdoc
      */
     public constructor(material: Material, priority?: number) {
+        if (material instanceof StandardMaterial === false) {
+            throw new Error("MToonPluginMaterial only accepts StandardMaterial");
+        }
         const defines = new MToonMaterialDefines();
         super(material, "MToon", priority ?? 100, defines, true, true, true);
         this._internalMarkAllSubMeshesAsTexturesDirty = material._dirtyCallbacks[Constants.MATERIAL_TextureDirtyFlag];
@@ -589,6 +592,9 @@ export class MToonPluginMaterial extends MaterialPluginBase {
                 };
             case "fragment":
                 return {
+                    CUSTOM_FRAGMENT_DEFINITIONS: customFragmentDefinitions,
+                    // use regexp to replace function arguments
+                    // "!computeCustomDiffuseLighting\\(info, diffuseBase, shadow\\);": "computeCustomDiffuseLighting(info, shadow);",
                     // CUSTOM_FRAGMENT_MAIN_END: 'gl_FragColor = vec4(1., 1., 1., 1.);',
                 }
         }
