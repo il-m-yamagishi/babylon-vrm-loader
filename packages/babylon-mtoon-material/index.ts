@@ -59,7 +59,7 @@ async function main() {
     const hemisphericLight = new HemisphericLight('HemisphericLight1', new Vector3(-0.2, -0.8, -1), scene);
     hemisphericLight.setEnabled(false);
     const pointLight = new PointLight('PointLight1', new Vector3(0, 0, 1), scene);
-    pointLight.setEnabled(true);
+    pointLight.setEnabled(false);
 
     // Shadows
     const shadowCaster = MeshBuilder.CreateTorusKnot('ShadowCaster', {}, scene);
@@ -81,11 +81,7 @@ async function main() {
     const standardMaterials: StandardMaterial[] = [];
     {
         const mat = new StandardMaterial("MToonMaterial1", scene);
-        // mat.specularColor = Color3.Black();
         const plugin = new MToonPluginMaterial(mat);
-        mat.diffuseTexture = diffuseTexture;
-        mat.bumpTexture = bumpTexture;
-        plugin.shadeMultiplyTexture = diffuseTexture;
         standardMaterials.push(mat);
     }
     // {

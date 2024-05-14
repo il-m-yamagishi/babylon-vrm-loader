@@ -577,6 +577,11 @@ export class MToonPluginMaterial extends MaterialPluginBase {
                 { name: "uvAnimationScrollYSpeedFactor", size: 1, type: "float" },
                 { name: "uvAnimationScrollRotationSpeedFactor", size: 1, type: "float" },
             ],
+            fragment: `
+            uniform vec3 shadeColorFactor;
+            uniform float shadingToonyFactor;
+            uniform float shadingShiftFactor;
+            `,
         };
     }
 
