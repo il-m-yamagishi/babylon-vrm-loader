@@ -37,6 +37,7 @@ export class MToonMaterialDefines extends MaterialDefines {
     /**
      * @inheritdoc
      */
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     constructor(externalProperties?: { [name: string]: { type: string; default: any } }) {
         super(externalProperties);
         this.rebuild();

@@ -5,19 +5,19 @@
  */
 
 import type { IAnimatable } from "@babylonjs/core/Animations/animatable.interface";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
-import { Material } from "@babylonjs/core/Materials/material";
+import type { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { BindTextureMatrix, PrepareDefinesForMergedUV } from "@babylonjs/core/Materials/materialHelper.functions";
 import { MaterialPluginBase } from "@babylonjs/core/Materials/materialPluginBase";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
+import type { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { SubMesh } from "@babylonjs/core/Meshes/subMesh";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import type { SubMesh } from "@babylonjs/core/Meshes/subMesh";
 import { expandToProperty, serialize, serializeAsColor3, serializeAsTexture } from "@babylonjs/core/Misc/decorators";
-import { Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 import type { Nullable } from "@babylonjs/core/types";
 import { MToonMaterialDefines } from "./mtoon-material-defines";
 
@@ -63,16 +63,14 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      */
     protected override readonly _material: StandardMaterial;
 
-    @serialize()
     public override readonly name = "MToonPluginMaterial";
 
     /**
      * Always resolves includes
      */
-    @serialize()
     public override readonly resolveIncludes = true;
 
-    @serialize()
+    @serialize("isEnabled")
     private _isEnabled = true;
     public get isEnabled(): boolean {
         return this._isEnabled;
@@ -112,7 +110,7 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      * A color that specifies the shade color. The value is evaluated in linear colorspace.
      */
     @serializeAsColor3()
-    public shadeColorFactor = Color3.Black();
+    public shadeColorFactor = Color3.White();
 
     /**
      * The texture multiplied for the shade color
@@ -328,9 +326,10 @@ export class MToonPluginMaterial extends MaterialPluginBase {
             throw new Error("MToonPluginMaterial only accepts StandardMaterial");
         }
         const defines = new MToonMaterialDefines();
-        super(material, "MToon", priority ?? 100, defines, true, true, true);
+        super(material, "MToon", priority ?? 100, defines, true);
         this._internalMarkAllSubMeshesAsTexturesDirty = material._dirtyCallbacks[Constants.MATERIAL_TextureDirtyFlag];
         this._internalMarkAllSubMeshesAsMiscsDirty = material._dirtyCallbacks[Constants.MATERIAL_MiscDirtyFlag];
+        this._enable(true);
     }
 
     /**
@@ -454,6 +453,22 @@ export class MToonPluginMaterial extends MaterialPluginBase {
                 uniformBuffer.updateFloat2("vUvAnimationMaskInfos", this.uvAnimationMaskTexture.coordinatesIndex, this.uvAnimationMaskTexture.level);
                 BindTextureMatrix(this.uvAnimationMaskTexture, uniformBuffer, "uvAnimationMask");
             }
+
+            uniformBuffer.updateColor3("shadeColorFactor", this.shadeColorFactor);
+            uniformBuffer.updateFloat("shadingShiftFactor", this.shadingShiftFactor);
+            uniformBuffer.updateFloat("shadingToonyFactor", this.shadingToonyFactor);
+            uniformBuffer.updateFloat("giEqualizationFactor", this.giEqualizationFactor);
+            uniformBuffer.updateColor3("matcapFactor", this.matcapFactor);
+            uniformBuffer.updateColor3("parametricRimColorFactor", this.parametricRimColorFactor);
+            uniformBuffer.updateFloat("parametricRimFresnelPowerFactor", this.parametricRimFresnelPowerFactor);
+            uniformBuffer.updateFloat("parametricRimLiftFactor", this.parametricRimLiftFactor);
+            uniformBuffer.updateFloat("rimLightingMixFactor", this.rimLightingMixFactor);
+            uniformBuffer.updateFloat("outlineWidthFactor", this.outlineWidthFactor);
+            uniformBuffer.updateColor3("outlineColorFactor", this.outlineColorFactor);
+            uniformBuffer.updateFloat("outlineLightingMixFactor", this.outlineLightingMixFactor);
+            uniformBuffer.updateFloat("uvAnimationScrollXSpeedFactor", this.uvAnimationScrollXSpeedFactor);
+            uniformBuffer.updateFloat("uvAnimationScrollYSpeedFactor", this.uvAnimationScrollYSpeedFactor);
+            uniformBuffer.updateFloat("uvAnimationScrollRotationSpeedFactor", this.uvAnimationScrollRotationSpeedFactor);
         }
 
         if (scene.texturesEnabled) {
@@ -476,22 +491,6 @@ export class MToonPluginMaterial extends MaterialPluginBase {
                 uniformBuffer.setTexture("uvAnimationMaskSampler", this.uvAnimationMaskTexture);
             }
         }
-
-        uniformBuffer.updateColor3("shadeColorFactor", this.shadeColorFactor);
-        uniformBuffer.updateFloat("shadingShiftFactor", this.shadingShiftFactor);
-        uniformBuffer.updateFloat("shadingToonyFactor", this.shadingToonyFactor);
-        uniformBuffer.updateFloat("giEqualizationFactor", this.giEqualizationFactor);
-        uniformBuffer.updateColor3("matcapFactor", this.matcapFactor);
-        uniformBuffer.updateColor3("parametricRimColorFactor", this.parametricRimColorFactor);
-        uniformBuffer.updateFloat("parametricRimFresnelPowerFactor", this.parametricRimFresnelPowerFactor);
-        uniformBuffer.updateFloat("parametricRimLiftFactor", this.parametricRimLiftFactor);
-        uniformBuffer.updateFloat("rimLightingMixFactor", this.rimLightingMixFactor);
-        uniformBuffer.updateFloat("outlineWidthFactor", this.outlineWidthFactor);
-        uniformBuffer.updateColor3("outlineColorFactor", this.outlineColorFactor);
-        uniformBuffer.updateFloat("outlineLightingMixFactor", this.outlineLightingMixFactor);
-        uniformBuffer.updateFloat("uvAnimationScrollXSpeedFactor", this.uvAnimationScrollXSpeedFactor);
-        uniformBuffer.updateFloat("uvAnimationScrollYSpeedFactor", this.uvAnimationScrollYSpeedFactor);
-        uniformBuffer.updateFloat("uvAnimationScrollRotationSpeedFactor", this.uvAnimationScrollRotationSpeedFactor);
     }
 
     /**
