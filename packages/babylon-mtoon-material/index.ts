@@ -8,7 +8,6 @@ import { PointLight } from '@babylonjs/core/Lights/pointLight';
 // import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 // import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
 import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';
-import { PBRMaterial } from '@babylonjs/core/Materials/PBR/pbrMaterial';
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
@@ -45,21 +44,25 @@ async function main() {
     camera.wheelDeltaPercentage = 0.01;
     camera.attachControl(canvas);
 
-    scene.createDefaultEnvironment({
-        createGround: true,
-        createSkybox: false,
-        enableGroundMirror: false,
-        enableGroundShadow: false,
-    });
+    // scene.createDefaultEnvironment({
+    //     createGround: true,
+    //     createSkybox: false,
+    //     enableGroundMirror: false,
+    //     enableGroundShadow: false,
+    // });
 
     // Lights
     const directionalLight = new DirectionalLight('DirectionalLight1', new Vector3(1, -0.5, 0.0), scene);
     directionalLight.position = new Vector3(-50, 25, 0);
+    directionalLight.intensity = 1.0;
+    // directionalLight.diffuse = Color3.Red();
     directionalLight.setEnabled(true);
     const hemisphericLight = new HemisphericLight('HemisphericLight1', new Vector3(-0.2, -0.8, -1), scene);
     hemisphericLight.setEnabled(false);
-    const pointLight = new PointLight('PointLight1', new Vector3(0, 0, 1), scene);
+    const pointLight = new PointLight('PointLight1', new Vector3(0, 0, -1), scene);
     pointLight.setEnabled(false);
+    pointLight.intensity = 1.0;
+    // pointLight.diffuse = Color3.Green();
 
     // Shadows
     const shadowCaster = MeshBuilder.CreateTorusKnot('ShadowCaster', {}, scene);
@@ -82,6 +85,18 @@ async function main() {
     {
         const mat = new StandardMaterial("MToonMaterial1", scene);
         const plugin = new MToonPluginMaterial(mat);
+        mat.diffuseColor = Color3.White();
+        plugin.shadeColorFactor = Color3.Gray();
+        standardMaterials.push(mat);
+    }
+    {
+        const mat = new StandardMaterial("MtoonMaterialNormal", scene);
+        const plugin = new MToonPluginMaterial(mat);
+        mat.diffuseColor = Color3.White();
+        mat.diffuseTexture = diffuseTexture;
+        mat.bumpTexture = bumpTexture;
+        plugin.shadeColorFactor = Color3.Gray();
+        plugin.shadeMultiplyTexture = mat.diffuseTexture;
         standardMaterials.push(mat);
     }
     // {
@@ -204,7 +219,8 @@ async function main() {
     {
         // No Normal
         const mat = new StandardMaterial('MToonMaterialNoNormal', scene);
-        new MToonPluginMaterial(mat);
+        const plugin = new MToonPluginMaterial(mat);
+        plugin.shadeColorFactor = Color3.Gray();
         const sphere = MeshBuilder.CreateSphere('MToonMaterialNoNormal_Sphere', {}, scene);
         sphere.position = new Vector3(1.2, 1, 0);
         sphere.receiveShadows = true;

@@ -13,6 +13,8 @@ export class MToonMaterialDefines extends MaterialDefines {
     /** @see ./shaders/light-fragment.frag */
     public readonly CUSTOMUSERLIGHTING = true;
     public readonly NDOTL = true;
+    public readonly SPECULARTERM = false;
+    public readonly VERTEXCOLOR = false;
 
     // MToon Specific
     public MTOON_OUTLINE_WIDTH_WORLD = false;

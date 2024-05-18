@@ -21,6 +21,8 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { Nullable } from "@babylonjs/core/types";
 import { MToonMaterialDefines } from "./mtoon-material-defines";
 
+import computeCustomDiffuseLighting from "./shaders/compute-custom-diffuse-lighting.frag.fx?raw";
+import customFragmentBeforeLights from "./shaders/custom-fragment-before-lights.frag.fx?raw";
 import customFragmentDefinitions from "./shaders/custom-fragment-definitions.frag.fx?raw";
 import customVertexDefinitions from "./shaders/custom-vertex-definitions.vert.fx?raw";
 import customVertexMainEnd from "./shaders/custom-vertex-main-end.vert.fx?raw";
@@ -511,11 +513,11 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      * @inheritdoc
      */
     public override getAnimatables(animatables: IAnimatable[]): void {
-        this.textures.forEach((texture) => {
+        for (const texture of this.textures) {
             if (texture.animations?.length) {
                 animatables.push(texture);
             }
-        });
+        }
     }
 
     /**
@@ -523,9 +525,9 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      */
     public override dispose(forceDisposeTextures?: boolean | undefined): void {
         if (forceDisposeTextures) {
-            this.textures.forEach((texture) => {
+            for (const texture of this.textures) {
                 texture.dispose();
-            });
+            }
         }
     }
 
@@ -552,7 +554,7 @@ export class MToonPluginMaterial extends MaterialPluginBase {
                 { name: "shadeMultiplyMatrix", size: 16, type: "mat4" },
                 { name: "shadingShiftFactor", size: 1, type: "float" },
                 { name: "vShadingShiftInfos", size: 3, type: "vec3" },
-                { name: "shadingShiftMatrix", size: 16, type: "mat2" },
+                { name: "shadingShiftMatrix", size: 16, type: "mat4" },
                 { name: "shadingToonyFactor", size: 1, type: "float" },
                 { name: "giEqualizationFactor", size: 1, type: "float" },
                 { name: "matcapFactor", size: 3, type: "vec3" },
@@ -576,10 +578,23 @@ export class MToonPluginMaterial extends MaterialPluginBase {
                 { name: "uvAnimationScrollYSpeedFactor", size: 1, type: "float" },
                 { name: "uvAnimationScrollRotationSpeedFactor", size: 1, type: "float" },
             ],
+            vertex: `
+            uniform vec3 shadeColorFactor;
+            uniform vec2 vShadeMultiplyInfos;
+            uniform mat4 shadeMultiplyMatrix;
+            uniform float shadingShiftFactor;
+            uniform vec3 vShadingShiftInfos;
+            uniform mat4 shadingShiftMatrix;
+            uniform float shadingToonyFactor;
+            `,
             fragment: `
             uniform vec3 shadeColorFactor;
-            uniform float shadingToonyFactor;
+            uniform vec2 vShadeMultiplyInfos;
+            uniform mat4 shadeMultiplyMatrix;
             uniform float shadingShiftFactor;
+            uniform vec3 vShadingShiftInfos;
+            uniform mat4 shadingShiftMatrix;
+            uniform float shadingToonyFactor;
             `,
         };
     }
@@ -597,9 +612,13 @@ export class MToonPluginMaterial extends MaterialPluginBase {
             case "fragment":
                 return {
                     CUSTOM_FRAGMENT_DEFINITIONS: customFragmentDefinitions,
-                    // use regexp to replace function arguments
-                    // "!computeCustomDiffuseLighting\\(info, diffuseBase, shadow\\);": "computeCustomDiffuseLighting(info, shadow);",
-                    // CUSTOM_FRAGMENT_MAIN_END: 'gl_FragColor = vec4(1., 1., 1., 1.);',
+                    CUSTOM_FRAGMENT_BEFORE_LIGHTS: customFragmentBeforeLights,
+                    // Use regexp to replace the function name
+                    "!info=computeSpotLighting": "info=computeMToonSpotLighting",
+                    "!info=computeHemisphericLighting": "info=computeMToonHemisphericLighting",
+                    "!info=computeLighting": "info=computeMToonLighting",
+                    // "!diffuseBase\\+=computeCustomDiffuseLighting\\(info,diffuseBase,shadow\\);": computeCustomDiffuseLighting,
+                    "!specularBase\\+=computeCustomSpecularLighting\\(info,specularBase,shadow\\);": "",
                 }
         }
         return null;
