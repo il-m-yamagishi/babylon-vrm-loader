@@ -22,7 +22,7 @@ import type { Nullable } from "@babylonjs/core/types";
 import { MToonMaterialDefines } from "./mtoon-material-defines";
 
 import computeCustomDiffuseLighting from "./shaders/compute-custom-diffuse-lighting.frag.fx?raw";
-import customFragmentBeforeLights from "./shaders/custom-fragment-before-lights.frag.fx?raw";
+import customFragmentBeforeFog from "./shaders/custom-fragment-before-fog.frag.fx?raw";
 import customFragmentDefinitions from "./shaders/custom-fragment-definitions.frag.fx?raw";
 import customVertexDefinitions from "./shaders/custom-vertex-definitions.vert.fx?raw";
 import customVertexMainEnd from "./shaders/custom-vertex-main-end.vert.fx?raw";
@@ -612,13 +612,15 @@ export class MToonPluginMaterial extends MaterialPluginBase {
             case "fragment":
                 return {
                     CUSTOM_FRAGMENT_DEFINITIONS: customFragmentDefinitions,
-                    CUSTOM_FRAGMENT_BEFORE_LIGHTS: customFragmentBeforeLights,
+                    CUSTOM_FRAGMENT_UPDATE_ALPHA: "baseColor.rgb = vec3(1.);", // Reset diffuseSampler
+                    CUSTOM_FRAGMENT_BEFORE_FOG: customFragmentBeforeFog,
                     // Use regexp to replace the function name
                     "!info=computeSpotLighting": "info=computeMToonSpotLighting",
                     "!info=computeHemisphericLighting": "info=computeMToonHemisphericLighting",
                     "!info=computeLighting": "info=computeMToonLighting",
-                    // "!diffuseBase\\+=computeCustomDiffuseLighting\\(info,diffuseBase,shadow\\);": computeCustomDiffuseLighting,
+                    "!diffuseBase\\+=computeCustomDiffuseLighting\\(info,diffuseBase,shadow\\);": computeCustomDiffuseLighting,
                     "!specularBase\\+=computeCustomSpecularLighting\\(info,specularBase,shadow\\);": "",
+
                 }
         }
         return null;

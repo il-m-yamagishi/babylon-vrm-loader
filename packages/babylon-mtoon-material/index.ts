@@ -1,12 +1,16 @@
-// import { VertexBuffer } from '@babylonjs/core/Buffers/buffer';
+/**
+ * MToonMaterial plugin
+ * @license MIT
+ * @author Masaru Yamagishi
+ */
+
 import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera';
 import { Engine } from '@babylonjs/core/Engines/engine';
 import { ShadowGenerator } from '@babylonjs/core/Lights/Shadows/shadowGenerator';
 import { DirectionalLight } from '@babylonjs/core/Lights/directionalLight';
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
 import { PointLight } from '@babylonjs/core/Lights/pointLight';
-// import { Texture } from '@babylonjs/core/Materials/Textures/texture';
-// import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
+import { VertexBuffer } from '@babylonjs/core/Buffers/buffer';
 import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
@@ -17,7 +21,6 @@ import { MToonPluginMaterial } from './src/mtoon-plugin-material';
 
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/inspector';
-import { VertexBuffer } from '@babylonjs/core/Buffers/buffer';
 
 async function createEngine(canvas: HTMLCanvasElement) {
     const debugProperties = getDebugProperties();
@@ -38,6 +41,7 @@ async function main() {
     const engine = await createEngine(canvas);
 
     const scene = new Scene(engine);
+    scene.ambientColor = Color3.Black();
     const camera = new ArcRotateCamera('MainCamera1', Math.PI * 1.5, 1, 3, new Vector3(0, 1.5, 0), scene, true);
     camera.lowerRadiusLimit = 0.1;
     camera.upperRadiusLimit = 20;
@@ -81,131 +85,29 @@ async function main() {
     bumpTexture.uScale = 4;
     bumpTexture.vScale = 4;
 
+    const shadeShiftTexture = new Texture("/shadeShift.png", scene);
+
     const standardMaterials: StandardMaterial[] = [];
     {
         const mat = new StandardMaterial("MToonMaterial1", scene);
+        mat.ambientColor = Color3.Black();
         const plugin = new MToonPluginMaterial(mat);
-        mat.diffuseColor = Color3.White();
-        plugin.shadeColorFactor = Color3.Gray();
+        plugin.shadeColorFactor = Color3.Black();
+        // plugin.shadingShiftFactor = 0.9;
+        // plugin.shadingShiftTexture = shadeShiftTexture;
+        // plugin.shadingShiftTextureScale = 0.5;
         standardMaterials.push(mat);
     }
     {
         const mat = new StandardMaterial("MtoonMaterialNormal", scene);
+        mat.ambientColor = Color3.Black();
         const plugin = new MToonPluginMaterial(mat);
-        mat.diffuseColor = Color3.White();
         mat.diffuseTexture = diffuseTexture;
         mat.bumpTexture = bumpTexture;
         plugin.shadeColorFactor = Color3.Gray();
         plugin.shadeMultiplyTexture = mat.diffuseTexture;
         standardMaterials.push(mat);
     }
-    // {
-    //     const mat = new MToonMaterial('MtoonMaterialNormal', scene);
-    //     mat.outlineWidthMode = 2;
-    //     // Textures from https://www.babylonjs-playground.com/#20OAV9#33
-    //     const diffuse = new Texture('http://i.imgur.com/Wk1cGEq.png', scene);
-    //     diffuse.uScale = 4;
-    //     diffuse.vScale = 4;
-    //     mat.diffuseTexture = diffuse;
-    //     mat.shadeTexture = mat.diffuseTexture.clone();
-    //     mat.shadeColor = new Color3(0.871, 0.196, 0.416);
-    //     const bump = new Texture('http://i.imgur.com/wGyk6os.png', scene);
-    //     bump.uScale = 4;
-    //     bump.vScale = 4;
-    //     mat.bumpTexture = bump;
-    //     mtoonMaterials.push(mat);
-    // }
-    // {
-    //     const mat = new MToonMaterial('MtoonMaterialTransparent', scene);
-    //     mat.outlineWidthMode = 1;
-    //     // Textures from https://www.babylonjs-playground.com/#YDO1F#18
-    //     mat.diffuseTexture = new Texture('https://upload.wikimedia.org/wikipedia/commons/8/87/Alaskan_Malamute%2BBlank.png', scene);
-    //     mat.diffuseTexture.hasAlpha = true;
-    //     mat.shadeTexture = mat.diffuseTexture.clone();
-    //     mat.alphaBlend = true;
-    //     mtoonMaterials.push(mat);
-    // }
-    // {
-    //     const mat = new MToonMaterial('MtoonMaterialTransparentCutout', scene);
-    //     mat.outlineWidthMode = 1;
-    //     // Textures from https://www.babylonjs-playground.com/#YDO1F#18
-    //     mat.diffuseTexture = new Texture('https://upload.wikimedia.org/wikipedia/commons/8/87/Alaskan_Malamute%2BBlank.png', scene);
-    //     mat.diffuseTexture.hasAlpha = true;
-    //     mat.shadeTexture = mat.diffuseTexture.clone();
-    //     mat.alphaTest = true;
-    //     mat.alphaCutOff = 0.5;
-    //     mtoonMaterials.push(mat);
-    // }
-    // {
-    //     const mat = new MToonMaterial('MtoonMaterialRim', scene);
-    //     mat.outlineWidthMode = 1;
-    //     mat.diffuseColor = new Color3(0, 0, 0);
-    //     mat.shadeColor = new Color3(0, 0, 0);
-    //     mat.rimColor = new Color3(1, 1, 1);
-    //     mtoonMaterials.push(mat);
-    // }
-    // {
-    //     const mat = new MToonMaterial('MtoonMaterialMatCap', scene);
-    //     // Textures from https://www.outworldz.com/cgi/free-seamless-textures.plx?c=UV%20Checker
-    //     mat.matCapTexture = new Texture('/matcap.png', scene, true, false);
-    //     mat.diffuseColor = new Color3(0, 0, 0);
-    //     mat.shadeColor = new Color3(0, 0, 0);
-    //     mtoonMaterials.push(mat);
-    // }
-    // {
-    //     const mat = new MToonMaterial('MtoonMaterialScroll', scene);
-    //     mat.outlineWidthMode = 1;
-    //     // Textures from https://www.babylonjs-playground.com/#20OAV9#33
-    //     const diffuse = new Texture('http://i.imgur.com/Wk1cGEq.png', scene);
-    //     diffuse.uScale = 4;
-    //     diffuse.vScale = 4;
-    //     mat.diffuseTexture = diffuse;
-    //     mat.shadeTexture = mat.diffuseTexture.clone();
-    //     mat.shadeColor = new Color3(0.5, 0.5, 0.5);
-
-    //     const bump = new Texture('http://i.imgur.com/wGyk6os.png', scene);
-    //     bump.uScale = 4;
-    //     bump.vScale = 4;
-    //     mat.bumpTexture = bump;
-    //     mat.uvAnimationScrollX = 0.5;
-    //     mtoonMaterials.push(mat);
-    // }
-    // {
-    //     const mat = new MToonMaterial('MtoonMaterialScrollY', scene);
-    //     mat.outlineWidthMode = 1;
-    //     // Textures from https://www.babylonjs-playground.com/#20OAV9#33
-    //     const diffuse = new Texture('http://i.imgur.com/Wk1cGEq.png', scene);
-    //     diffuse.uScale = 4;
-    //     diffuse.vScale = 4;
-    //     mat.diffuseTexture = diffuse;
-    //     mat.shadeTexture = mat.diffuseTexture.clone();
-    //     mat.shadeColor = new Color3(0.5, 0.5, 0.5);
-
-    //     const bump = new Texture('http://i.imgur.com/wGyk6os.png', scene);
-    //     bump.uScale = 4;
-    //     bump.vScale = 4;
-    //     mat.bumpTexture = bump;
-    //     mat.uvAnimationScrollY = 0.5;
-    //     mtoonMaterials.push(mat);
-    // }
-    // {
-    //     const mat = new MToonMaterial('MtoonMaterialRotation', scene);
-    //     mat.outlineWidthMode = 1;
-    //     // Textures from https://www.babylonjs-playground.com/#20OAV9#33
-    //     const diffuse = new Texture('http://i.imgur.com/Wk1cGEq.png', scene);
-    //     diffuse.uScale = 4;
-    //     diffuse.vScale = 4;
-    //     mat.diffuseTexture = diffuse;
-    //     mat.shadeTexture = mat.diffuseTexture.clone();
-    //     mat.shadeColor = new Color3(0.5, 0.5, 0.5);
-
-    //     const bump = new Texture('http://i.imgur.com/wGyk6os.png', scene);
-    //     bump.uScale = 4;
-    //     bump.vScale = 4;
-    //     mat.bumpTexture = bump;
-    //     mat.uvAnimationRotation = 0.1;
-    //     mtoonMaterials.push(mat);
-    // }
 
     standardMaterials.forEach((mat, index) => {
         // Right-coordinates for glTF
@@ -217,7 +119,7 @@ async function main() {
     });
 
     {
-        // No Normal
+        // No Normal attribute
         const mat = new StandardMaterial('MToonMaterialNoNormal', scene);
         const plugin = new MToonPluginMaterial(mat);
         plugin.shadeColorFactor = Color3.Gray();
@@ -244,6 +146,7 @@ async function main() {
     window.addEventListener('resize', () => {
         engine.resize();
     });
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     (window as any).currentScene = scene;
 }
 

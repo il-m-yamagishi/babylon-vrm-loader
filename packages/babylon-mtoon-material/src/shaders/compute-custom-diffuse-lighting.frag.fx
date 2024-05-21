@@ -1,2 +1,8 @@
+diffuseBase += computeCustomDiffuseLighting(info, diffuseBase, shadow);
 
-// diffuseBase += computeCustomDiffuseLighting(mtoonInfo, shadow);
+#ifdef CLEARCOAT
+    clearCoatBase += info.clearCoat.rgb * shadow;
+#endif
+#ifdef SHEEN
+    sheenBase += info.sheen.rgb * shadow;
+#endif

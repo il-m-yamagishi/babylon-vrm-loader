@@ -7,12 +7,6 @@
 
 
 
-
-#define inline
-float linearstep(float a, float b, float t) {
-    return clamp((t - a) / (b - a), 0., 1.);
-}
-
 /**
  * @see https://github.com/BabylonJS/Babylon.js/blob/master/packages/dev/core/src/Shaders/ShadersInclude/lightsFragmentFunctions.fx
  */
@@ -50,43 +44,103 @@ lightingInfo computeMToonSpotLighting(vec3 viewDirectionW, vec3 vNormal, vec4 li
         attenuation *= cosAngle;
 
         result.diffuse = diffuseColor.rgb * attenuation;
+        result.ndl = dot(vNormal, lightVectorW);
 
         return result;
     }
 
-    result.diffuse = vec3(0.);
-
     // out of range
+    result.diffuse = vec3(0.);
+    result.ndl = 0.;
     return result;
 }
 
 lightingInfo computeMToonHemisphericLighting(vec3 viewDirectionW, vec3 vNormal, vec4 lightData, vec3 diffuseColor, vec3 specularColor, vec3 groundColor, float glossiness) {
     lightingInfo result;
 
-    float ndotl = dot(vNormal, lightData.xyz);
-    result.diffuse = vec3(ndotl);
+    result.diffuse = diffuseColor;
+    result.ndl = dot(vNormal, lightData.xyz);
+
     return result;
 }
 
 
 
 vec3 computeCustomDiffuseLighting(lightingInfo info, vec3 diffuseBase, float shadow) {
-    // return info.diffuse;
-    // info.ndl is dot(Normal, LightDir) * 0.5 + 0.5
     float shading = info.ndl; // [-1.0, 1.0]
 
-    // calculate shadingShiftFactor
+    shading = shading * 0.5 + 0.5; // [0.0, 1.0]
+
+    return info.diffuse.rgb * shading * shadow;
+//     float shading = info.ndl; // [-1.0, 1.0]
+
+//     // calculate shadingShiftFactor
+//     shading += shadingShiftFactor;
+// #ifdef SHADING_SHIFT
+//     shading += texture2D(shadingShiftSampler, vShadingShiftUV).r * vShadingShiftInfos.y * vShadingShiftInfos.z;
+// #endif
+//     shading = linearstep(-1. + shadingToonyFactor, 1. - shadingToonyFactor, shading);
+//     shading *= shadow; // apply shadow
+
+//     // calculate diffuse color
+//     vec3 diffuse = vDiffuseColor.rgb * info.diffuse.rgb;
+// #ifdef DIFFUSE
+//     diffuse *= texture2D(diffuseSampler, vDiffuseUV).rgb * vDiffuseInfos.y;
+// #endif
+
+//     // calculate shade color
+//     vec3 shadeMultiply = shadeColorFactor;
+// #ifdef SHADE_MULTIPLY
+//     shadeMultiply *= texture2D(shadeMultiplySampler, vShadeMultiplyUV).rgb * vShadeMultiplyInfos.y;
+// #endif
+
+//     return mix(shadeMultiply, diffuse, shading);
+}
+
+vec3 computeCustomSpecularLighting(lightingInfo info, vec3 diffuseBase, float shadow) {
+    // disables specular lighting
+    return vec3(0.);
+}
+
+#define inline
+float linearstep(float a, float b, float t) {
+    return clamp((t - a) / (b - a), 0., 1.);
+}
+
+/**
+ * Compute MToon final color
+ * @param diffuseBase Light color attenuation
+ * @param diffuseColor vDiffuseColor.rgb
+ * @param baseColor baseColor.rgb
+ * @param emissiveColor vEmissiveColor.rgb + emissiveSampler
+ * @param vAmbientColor vAmbientColor.rgb
+ * @param baseAmbientColor ambientSampler
+ * @param finalSpecular vSpecularColor.rgb
+ * @param reflectionColor reflectionSampler
+ * @param refractionColor refractionSampler
+ */
+vec3 computeMToonColor(
+    vec3 diffuseBase,
+    vec3 diffuseColor,
+    vec3 baseColor,
+    vec3 emissiveColor,
+    vec3 vAmbientColor,
+    vec3 baseAmbientColor,
+    vec3 finalSpecular,
+    vec3 reflectionColor,
+    vec3 refractionColor
+) {
+    // Calculate shading factor
+    float shading = max(diffuseBase.r, max(diffuseBase.g, diffuseBase.b)) * 2.0 - 1.0; // [-1.0, 1.0]
     shading += shadingShiftFactor;
 #ifdef SHADING_SHIFT
     shading += texture2D(shadingShiftSampler, vShadingShiftUV).r * vShadingShiftInfos.y * vShadingShiftInfos.z;
 #endif
     shading = linearstep(-1. + shadingToonyFactor, 1. - shadingToonyFactor, shading);
-    shading *= shadow; // apply shadow
 
-    // calculate diffuse color
-    vec3 diffuse = vDiffuseColor.rgb * info.diffuse.rgb;
+    vec3 litColor = diffuseColor;
 #ifdef DIFFUSE
-    diffuse *= texture2D(diffuseSampler, vDiffuseUV).rgb * vDiffuseInfos.y;
+    litColor *= texture2D(diffuseSampler, vDiffuseUV).rgb * vDiffuseInfos.y;
 #endif
 
     // calculate shade color
@@ -95,10 +149,32 @@ vec3 computeCustomDiffuseLighting(lightingInfo info, vec3 diffuseBase, float sha
     shadeMultiply *= texture2D(shadeMultiplySampler, vShadeMultiplyUV).rgb * vShadeMultiplyInfos.y;
 #endif
 
-    return mix(shadeMultiply, diffuse, shading);
-}
+    vec3 diffuse = mix(shadeMultiply, litColor, shading);
 
-vec3 computeCustomSpecularLighting(lightingInfo info, vec3 diffuseBase, float shadow) {
-    // disables specular lighting
-    return vec3(0.);
+    // Composition
+#ifdef EMISSIVEASILLUMINATION
+    vec3 finalDiffuse = clamp(diffuse + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
+#else
+    vec3 finalDiffuse = clamp((diffuse + emissiveColor) + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
+#endif
+
+    // Composition
+#ifdef EMISSIVEASILLUMINATION
+    vec3 color = vec3(clamp(finalDiffuse * baseAmbientColor + finalSpecular + reflectionColor.rgb + emissiveColor + refractionColor.rgb, 0.0, 1.0));
+#else
+    vec3 color = vec3(finalDiffuse * baseAmbientColor + finalSpecular + reflectionColor.rgb + refractionColor.rgb);
+#endif
+
+//Old lightmap calculation method
+#ifdef LIGHTMAP
+    #ifndef LIGHTMAPEXCLUDED
+        #ifdef USELIGHTMAPASSHADOWMAP
+            color *= lightmapColor.rgb;
+        #else
+            color += lightmapColor.rgb;
+        #endif
+    #endif
+#endif
+
+    return color;
 }
