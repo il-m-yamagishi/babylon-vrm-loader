@@ -22,7 +22,6 @@ import type { Nullable } from "@babylonjs/core/types";
 import { MToonMaterialDefines } from "./mtoon-material-defines";
 
 import computeCustomDiffuseLighting from "./shaders/compute-custom-diffuse-lighting.frag.fx?raw";
-import customFragmentBeforeFog from "./shaders/custom-fragment-before-fog.frag.fx?raw";
 import customFragmentDefinitions from "./shaders/custom-fragment-definitions.frag.fx?raw";
 import customVertexDefinitions from "./shaders/custom-vertex-definitions.vert.fx?raw";
 import customVertexMainEnd from "./shaders/custom-vertex-main-end.vert.fx?raw";
@@ -110,6 +109,7 @@ export class MToonPluginMaterial extends MaterialPluginBase {
     /**
      * The shade color
      * A color that specifies the shade color. The value is evaluated in linear colorspace.
+     * @default Color3.White()
      */
     @serializeAsColor3()
     public shadeColorFactor = Color3.White();
@@ -131,7 +131,7 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      * See the section [Shading Shift](https://github.com/vrm-c/vrm-specification/blob/master/specification/VRMC_materials_mtoon-1.0/README.md#Shading%20Shift) for specific details on how the calculation is performed.
      */
     @serialize()
-    public shadingShiftFactor = 0.0;
+    public shadingShiftFactor = -0.05;
 
     /**
      * The texture which shift the position of shading boundary
@@ -160,7 +160,7 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      * See the section [Shading Shift](https://github.com/vrm-c/vrm-specification/blob/master/specification/VRMC_materials_mtoon-1.0/README.md#Shading%20Shift) for specific details on how the calculation is performed.
      */
     @serialize()
-    public shadingToonyFactor = 0.9;
+    public shadingToonyFactor = 0.95;
 
     /**
      * Defines the equalization factor of the global illumination.
@@ -612,15 +612,17 @@ export class MToonPluginMaterial extends MaterialPluginBase {
             case "fragment":
                 return {
                     CUSTOM_FRAGMENT_DEFINITIONS: customFragmentDefinitions,
+                    CUSTOM_FRAGMENT_BEFORE_LIGHTS: "vec4 mtoonDiffuse = vec4(0.);",
                     CUSTOM_FRAGMENT_UPDATE_ALPHA: "baseColor.rgb = vec3(1.);", // Reset diffuseSampler
-                    CUSTOM_FRAGMENT_BEFORE_FOG: customFragmentBeforeFog,
                     // Use regexp to replace the function name
                     "!info=computeSpotLighting": "info=computeMToonSpotLighting",
                     "!info=computeHemisphericLighting": "info=computeMToonHemisphericLighting",
                     "!info=computeLighting": "info=computeMToonLighting",
                     "!diffuseBase\\+=computeCustomDiffuseLighting\\(info,diffuseBase,shadow\\);": computeCustomDiffuseLighting,
                     "!specularBase\\+=computeCustomSpecularLighting\\(info,specularBase,shadow\\);": "",
-
+                    "!vec3 finalDiffuse=clamp\\(diffuseBase*diffuseColor\\+vAmbientColor,0\\.0,1\\.0\\)*baseColor.rgb;": "vec3 finalDiffuse = computeMToonFinalDiffuse(viewDirectionW, normalW, mtoonDiffuse, diffuseColor, baseColor.rgb, emissiveColor);",
+                    "!vec3 finalDiffuse=clamp\\(\\(diffuseBase\\+emissiveColor\\)*diffuseColor+vAmbientColor,0\\.0,1\\.0\\)*baseColor.rgb;": "vec3 finalDiffuse = computeMToonFinalDiffuse(viewDirectionW, normalW, mtoonDiffuse, diffuseColor, baseColor.rgb, emissiveColor);",
+                    "!vec3 finalDiffuse=clamp\\(diffuseBase\\*diffuseColor\\+emissiveColor\\+vAmbientColor,0\\.0,1\\.0\\)\\*baseColor.rgb;": "vec3 finalDiffuse = computeMToonFinalDiffuse(viewDirectionW, normalW, mtoonDiffuse, diffuseColor, baseColor.rgb, emissiveColor);",
                 }
         }
         return null;

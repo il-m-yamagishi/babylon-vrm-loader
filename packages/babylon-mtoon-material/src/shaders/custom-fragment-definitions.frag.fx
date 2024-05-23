@@ -51,7 +51,7 @@ lightingInfo computeMToonSpotLighting(vec3 viewDirectionW, vec3 vNormal, vec4 li
 
     // out of range
     result.diffuse = vec3(0.);
-    result.ndl = 0.;
+    result.ndl = -1.;
     return result;
 }
 
@@ -66,77 +66,49 @@ lightingInfo computeMToonHemisphericLighting(vec3 viewDirectionW, vec3 vNormal, 
 
 
 
-vec3 computeCustomDiffuseLighting(lightingInfo info, vec3 diffuseBase, float shadow) {
-    float shading = info.ndl; // [-1.0, 1.0]
-
-    shading = shading * 0.5 + 0.5; // [0.0, 1.0]
-
-    return info.diffuse.rgb * shading * shadow;
-//     float shading = info.ndl; // [-1.0, 1.0]
-
-//     // calculate shadingShiftFactor
-//     shading += shadingShiftFactor;
-// #ifdef SHADING_SHIFT
-//     shading += texture2D(shadingShiftSampler, vShadingShiftUV).r * vShadingShiftInfos.y * vShadingShiftInfos.z;
-// #endif
-//     shading = linearstep(-1. + shadingToonyFactor, 1. - shadingToonyFactor, shading);
-//     shading *= shadow; // apply shadow
-
-//     // calculate diffuse color
-//     vec3 diffuse = vDiffuseColor.rgb * info.diffuse.rgb;
-// #ifdef DIFFUSE
-//     diffuse *= texture2D(diffuseSampler, vDiffuseUV).rgb * vDiffuseInfos.y;
-// #endif
-
-//     // calculate shade color
-//     vec3 shadeMultiply = shadeColorFactor;
-// #ifdef SHADE_MULTIPLY
-//     shadeMultiply *= texture2D(shadeMultiplySampler, vShadeMultiplyUV).rgb * vShadeMultiplyInfos.y;
-// #endif
-
-//     return mix(shadeMultiply, diffuse, shading);
-}
-
-vec3 computeCustomSpecularLighting(lightingInfo info, vec3 diffuseBase, float shadow) {
-    // disables specular lighting
-    return vec3(0.);
-}
-
 #define inline
 float linearstep(float a, float b, float t) {
     return clamp((t - a) / (b - a), 0., 1.);
 }
-
-/**
- * Compute MToon final color
- * @param diffuseBase Light color attenuation
- * @param diffuseColor vDiffuseColor.rgb
- * @param baseColor baseColor.rgb
- * @param emissiveColor vEmissiveColor.rgb + emissiveSampler
- * @param vAmbientColor vAmbientColor.rgb
- * @param baseAmbientColor ambientSampler
- * @param finalSpecular vSpecularColor.rgb
- * @param reflectionColor reflectionSampler
- * @param refractionColor refractionSampler
- */
-vec3 computeMToonColor(
-    vec3 diffuseBase,
-    vec3 diffuseColor,
-    vec3 baseColor,
-    vec3 emissiveColor,
-    vec3 vAmbientColor,
-    vec3 baseAmbientColor,
-    vec3 finalSpecular,
-    vec3 reflectionColor,
-    vec3 refractionColor
-) {
-    // Calculate shading factor
-    float shading = max(diffuseBase.r, max(diffuseBase.g, diffuseBase.b)) * 2.0 - 1.0; // [-1.0, 1.0]
+vec4 computeCustomDiffuseLighting(lightingInfo info, vec3 diffuseBase, float shadow) {
+    float shading = info.ndl; // [-1.0, 1.0]
     shading += shadingShiftFactor;
 #ifdef SHADING_SHIFT
     shading += texture2D(shadingShiftSampler, vShadingShiftUV).r * vShadingShiftInfos.y * vShadingShiftInfos.z;
 #endif
     shading = linearstep(-1. + shadingToonyFactor, 1. - shadingToonyFactor, shading);
+
+    vec3 color = mix(vec3(0.), info.diffuse.rgb * shadow, shading);
+
+    return vec4(color, shading);
+}
+
+vec3 computeCustomSpecularLighting(lightingInfo info, vec3 specularBase, float shadow) {
+    // disables specular lighting
+    return vec3(0.);
+}
+
+
+
+/**
+ * Compute MToon final color
+ * @param viewDirectionW vEyePosition.xyz - vPositionW
+ * @param normalW vNormalW
+ * @param lightColor Light color attenuation(w is shading)
+ * @param diffuseColor vDiffuseColor.rgb
+ * @param baseColor baseColor.rgb
+ * @param emissiveColor vEmissiveColor.rgb + emissiveSampler
+ */
+vec3 computeMToonFinalDiffuse(
+    vec3 viewDirectionW,
+    vec3 normalW,
+    vec4 lightColor,
+    vec3 diffuseColor,
+    vec3 baseColor,
+    vec3 emissiveColor
+) {
+    // Calculate shading factor
+    float shading = lightColor.w; // [-1.0, 1.0]
 
     vec3 litColor = diffuseColor;
 #ifdef DIFFUSE
@@ -144,37 +116,42 @@ vec3 computeMToonColor(
 #endif
 
     // calculate shade color
-    vec3 shadeMultiply = shadeColorFactor;
+    vec3 shadeColor = shadeColorFactor;
 #ifdef SHADE_MULTIPLY
-    shadeMultiply *= texture2D(shadeMultiplySampler, vShadeMultiplyUV).rgb * vShadeMultiplyInfos.y;
+    shadeColor *= texture2D(shadeMultiplySampler, vShadeMultiplyUV).rgb * vShadeMultiplyInfos.y;
 #endif
 
-    vec3 diffuse = mix(shadeMultiply, litColor, shading);
+    shadeColor = mix(shadeColor, vec3(0.), shading);
+
+    // rim and matcap
+    vec3 rim = vec3(0.);
+#ifdef MATCAP
+    vec3 worldViewX = normalize(vec3(viewDirectionW.z, 0.0, -viewDirectionW.x));
+    vec3 worldViewY = cross(viewDirectionW, worldViewX);
+    vec2 matcapUv = vec2(dot(worldViewX, normalW), dot(worldViewY, normalW)) * 0.495 + 0.5;
+    rim = matcapFactor * texture2D(matcapSampler, matcapUv).rgb * vMatcapInfos.y;
+#endif
+    float parametricRim = clamp(1.0 - dot(normalW, viewDirectionW) + parametricRimLiftFactor, 0.0, 1.0);
+    parametricRim = pow(parametricRim, max(parametricRimFresnelPowerFactor, 0.00001));
+    rim = rim + parametricRim * parametricRimColorFactor;
+#ifdef RIM
+    rim = rim + texture2D(rimMultiplySampler, vRimMultiplyUV).rgb * vRimMultiplyInfos.y;
+#endif
+    rim = rim * mix(vec3(1.0), litColor + shadeColor, rimLightingMixFactor);
+
+    vec3 diffuse = litColor * lightColor.rgb + shadeColor + rim;
 
     // Composition
 #ifdef EMISSIVEASILLUMINATION
-    vec3 finalDiffuse = clamp(diffuse + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
+    vec3 color = clamp(diffuse + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
 #else
-    vec3 finalDiffuse = clamp((diffuse + emissiveColor) + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
+#ifdef LINKEMISSIVEWITHDIFFUSE
+    vec3 color = clamp((diffuse + emissiveColor) + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
+#else
+    vec3 color = clamp(diffuse + emissiveColor + vAmbientColor, 0.0, 1.0) * baseColor.rgb;
 #endif
 
-    // Composition
-#ifdef EMISSIVEASILLUMINATION
-    vec3 color = vec3(clamp(finalDiffuse * baseAmbientColor + finalSpecular + reflectionColor.rgb + emissiveColor + refractionColor.rgb, 0.0, 1.0));
-#else
-    vec3 color = vec3(finalDiffuse * baseAmbientColor + finalSpecular + reflectionColor.rgb + refractionColor.rgb);
-#endif
 
-//Old lightmap calculation method
-#ifdef LIGHTMAP
-    #ifndef LIGHTMAPEXCLUDED
-        #ifdef USELIGHTMAPASSHADOWMAP
-            color *= lightmapColor.rgb;
-        #else
-            color += lightmapColor.rgb;
-        #endif
-    #endif
-#endif
 
     return color;
 }

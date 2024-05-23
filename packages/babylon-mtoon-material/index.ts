@@ -66,7 +66,7 @@ async function main() {
     const pointLight = new PointLight('PointLight1', new Vector3(0, 0, -1), scene);
     pointLight.setEnabled(false);
     pointLight.intensity = 1.0;
-    // pointLight.diffuse = Color3.Green();
+    pointLight.diffuse = Color3.Green();
 
     // Shadows
     const shadowCaster = MeshBuilder.CreateTorusKnot('ShadowCaster', {}, scene);
@@ -85,27 +85,28 @@ async function main() {
     bumpTexture.uScale = 4;
     bumpTexture.vScale = 4;
 
+    const matcapTexture = new Texture("/matcap.png", scene);
+
     const shadeShiftTexture = new Texture("/shadeShift.png", scene);
 
     const standardMaterials: StandardMaterial[] = [];
     {
         const mat = new StandardMaterial("MToonMaterial1", scene);
-        mat.ambientColor = Color3.Black();
         const plugin = new MToonPluginMaterial(mat);
         plugin.shadeColorFactor = Color3.Black();
-        // plugin.shadingShiftFactor = 0.9;
+        // plugin.shadingShiftFactor = -0.5;
         // plugin.shadingShiftTexture = shadeShiftTexture;
         // plugin.shadingShiftTextureScale = 0.5;
+        // plugin.matcapTexture = matcapTexture;
         standardMaterials.push(mat);
     }
     {
         const mat = new StandardMaterial("MtoonMaterialNormal", scene);
-        mat.ambientColor = Color3.Black();
         const plugin = new MToonPluginMaterial(mat);
         mat.diffuseTexture = diffuseTexture;
         mat.bumpTexture = bumpTexture;
-        plugin.shadeColorFactor = Color3.Gray();
         plugin.shadeMultiplyTexture = mat.diffuseTexture;
+        plugin.shadeColorFactor = Color3.Black();
         standardMaterials.push(mat);
     }
 
@@ -122,7 +123,7 @@ async function main() {
         // No Normal attribute
         const mat = new StandardMaterial('MToonMaterialNoNormal', scene);
         const plugin = new MToonPluginMaterial(mat);
-        plugin.shadeColorFactor = Color3.Gray();
+        plugin.shadeColorFactor = new Color3(0.97, 0.81, 0.86);
         const sphere = MeshBuilder.CreateSphere('MToonMaterialNoNormal_Sphere', {}, scene);
         sphere.position = new Vector3(1.2, 1, 0);
         sphere.receiveShadows = true;
