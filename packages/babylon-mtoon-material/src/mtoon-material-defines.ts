@@ -4,17 +4,17 @@
  * @author Masaru Yamagishi
  */
 
-import { MaterialDefines } from '@babylonjs/core/Materials/materialDefines';
+import { MaterialDefines } from "@babylonjs/core/Materials/materialDefines";
 
 /**
  * MToon specific material defines
  */
 export class MToonMaterialDefines extends MaterialDefines {
-    /** @see ./shaders/light-fragment.frag */
-    public readonly CUSTOMUSERLIGHTING = true;
-    public readonly NDOTL = true;
-    public readonly SPECULARTERM = false;
-    public readonly VERTEXCOLOR = false;
+    /** @see ./shaders/custom-fragment-definitions.frag.fx */
+    public readonly CUSTOMUSERLIGHTING = true; // Use custom lighting
+    public readonly NDOTL = true; // Use NdotL
+    public readonly SPECULARTERM = false; // No specular
+    public readonly VERTEXCOLOR = false; // No Vertex color
 
     // MToon Specific
     public MTOON_OUTLINE_WIDTH_WORLD = false;

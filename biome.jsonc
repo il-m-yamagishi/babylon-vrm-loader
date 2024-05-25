@@ -5,7 +5,6 @@
     },
     "formatter": {
         "enabled": true,
-        "indentSize": 4,
         "indentStyle": "space",
         "indentWidth": 4,
         "lineEnding": "crlf",

@@ -16,6 +16,7 @@
     "devDependencies": {
         "@biomejs/biome": "1.7.3",
         "@types/node": "^20.0.0",
+        "cz-conventional-changelog": "^3.3.0",
         "semantic-release": "^23.1.1",
         "semantic-release-monorepo": "^8.0.2"
     }

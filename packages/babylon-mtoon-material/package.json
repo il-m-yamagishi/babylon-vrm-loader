@@ -1,10 +1,10 @@
 {
     "name": "@m-yamagishi/babylon-mtoon-material",
-    "version": "0.0.0",
-    "description": "Unity MToon Shader WebGL porting with babylon.js",
+    "version": "0.1.0",
+    "description": "Port of VRM MToon Shader to Babylon.js WebGL",
     "license": "MIT",
     "author": {
-        "email": "yamagishi.iloop@gmail.com",
+        "email": "akai_inu@live.jp",
         "name": "Masaru Yamagishi",
         "url": "https://github.com/il-m-yamagishi"
     },
@@ -20,54 +20,48 @@
         "Material"
     ],
     "files": [
-        "dist/**/*"
+        "dist/babylon-mtoon-plugin-material.umd.cjs",
+        "dist/babylon-mtoon-plugin-material.js",
+        "types/src"
     ],
     "type": "module",
-    "typings": "dist/index.d.ts",
-    "main": "dist/index.module.js",
+    "browser": "dist/babylon-mtoon-plugin-material.umd.cjs",
+    "module": "dist/babylon-mtoon-plugin-material.js",
+    "exports": {
+        ".": {
+            "import": "./dist/babylon-mtoon-plugin-material.js",
+            "require": "./dist/babylon-mtoon-plugin-material.umd.cjs"
+        }
+    },
     "devDependencies": {
         "@babylonjs/core": "^7.2.2",
         "@babylonjs/inspector": "^7.2.2",
         "babylonjs-gltf2interface": "^7.2.2",
         "tslib": "^2.6.2",
         "typescript": "~5.4.5",
-        "vite": "^5.2.11"
+        "vite": "^5.2.11",
+        "vite-plugin-externalize-deps": "^0.8.0"
     },
     "peerDependencies": {
         "@babylonjs/core": "^7.2.2"
     },
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build && tsc",
+        "test": "tsc",
+        "commit": "cz",
+        "lint": "biome ci index.ts src/*.ts"
     },
     "config": {
         "commitizen": {
-            "path": "./node_modules/cz-conventional-changelog"
+            "path": "cz-conventional-changelog"
         }
     },
     "release": {
         "plugins": [
             "@semantic-release/commit-analyzer",
             "@semantic-release/release-notes-generator",
-            [
-                "@semantic-release/github",
-                {
-                    "assets": [
-                        {
-                            "path": "dist/index.js",
-                            "label": "window.MToonMaterial assignation File"
-                        },
-                        {
-                            "path": "dist/index.module.js",
-                            "label": "UMD File"
-                        },
-                        {
-                            "path": "dist/mtoon-material.d.ts",
-                            "label": "Type definition File"
-                        }
-                    ]
-                }
-            ],
+            "@semantic-release/github",
             "@semantic-release/npm",
             "@semantic-release/git"
         ]

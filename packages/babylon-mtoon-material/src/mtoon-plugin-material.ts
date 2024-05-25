@@ -535,18 +535,48 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      * @inheritdoc
      */
     public override getSamplers(samplers: string[]): void {
-        samplers.push("shadeMultiplySampler");
-        samplers.push("shadingShiftSampler");
-        samplers.push("matcapSampler");
-        samplers.push("rimMultiplySampler");
-        samplers.push("outlineWidthMultiplySampler");
-        samplers.push("uvAnimationMaskSampler");
+        samplers.push("shadeMultiplySampler", "shadingShiftSampler", "matcapSampler", "rimMultiplySampler", "outlineWidthMultiplySampler", "uvAnimationMaskSampler");
     }
 
     /**
      * @inheritdoc
      */
-    public override getUniforms(): { ubo?: { name: string; size?: number | undefined; type?: string | undefined; arraySize?: number | undefined; }[] | undefined; vertex?: string | undefined; fragment?: string | undefined; } {
+    public override getUniforms(): {
+        ubo?: { name: string; size?: number | undefined; type?: string | undefined; arraySize?: number | undefined }[] | undefined;
+        vertex?: string | undefined;
+        fragment?: string | undefined;
+    } {
+        const webgl1uniforms = `
+        uniform vec3 shadeColorFactor;
+        uniform vec2 vShadeMultiplyInfos;
+        uniform mat4 shadeMultiplyMatrix;
+        uniform float shadingShiftFactor;
+        uniform vec3 vShadingShiftInfos;
+        uniform mat4 shadingShiftMatrix;
+        uniform float shadingToonyFactor;
+        uniform float giEqualizationFactor;
+        uniform vec3 matcapFactor;
+        uniform vec2 vMatcapInfos;
+        uniform mat4 matcapMatrix;
+        uniform vec3 parametricRimColorFactor;
+        uniform float parametricRimFresnelPowerFactor;
+        uniform float parametricRimLiftFactor;
+        uniform vec2 vRimMultiplyInfos;
+        uniform mat4 rimMultiplyMatrix;
+        uniform float rimLightingMixFactor;
+        uniform float outlineWidthMode;
+        uniform float outlineWidthFactor;
+        uniform vec2 vOutlineWidthMultiplyInfos;
+        uniform mat4 outlineWidthMultiplyMatrix;
+        uniform vec3 outlineColorFactor;
+        uniform float outlineLightingMixFactor;
+        uniform vec2 vUvAnimationMaskInfos;
+        uniform mat4 uvAnimationMaskMatrix;
+        uniform float uvAnimationScrollXSpeedFactor;
+        uniform float uvAnimationScrollYSpeedFactor;
+        uniform float uvAnimationScrollRotationSpeedFactor;
+        `;
+
         return {
             ubo: [
                 { name: "shadeColorFactor", size: 3, type: "vec3" },
@@ -578,31 +608,17 @@ export class MToonPluginMaterial extends MaterialPluginBase {
                 { name: "uvAnimationScrollYSpeedFactor", size: 1, type: "float" },
                 { name: "uvAnimationScrollRotationSpeedFactor", size: 1, type: "float" },
             ],
-            vertex: `
-            uniform vec3 shadeColorFactor;
-            uniform vec2 vShadeMultiplyInfos;
-            uniform mat4 shadeMultiplyMatrix;
-            uniform float shadingShiftFactor;
-            uniform vec3 vShadingShiftInfos;
-            uniform mat4 shadingShiftMatrix;
-            uniform float shadingToonyFactor;
-            `,
-            fragment: `
-            uniform vec3 shadeColorFactor;
-            uniform vec2 vShadeMultiplyInfos;
-            uniform mat4 shadeMultiplyMatrix;
-            uniform float shadingShiftFactor;
-            uniform vec3 vShadingShiftInfos;
-            uniform mat4 shadingShiftMatrix;
-            uniform float shadingToonyFactor;
-            `,
+            vertex: webgl1uniforms,
+            fragment: webgl1uniforms,
         };
     }
 
     /**
      * @inheritdoc
      */
-    public override getCustomCode(shaderType: string): Nullable<{ [pointName: string]: string; }> {
+    public override getCustomCode(shaderType: string): Nullable<{ [pointName: string]: string }> {
+        const finalDiffuse = "vec3 finalDiffuse = computeMToonFinalDiffuse(viewDirectionW, normalW, mtoonDiffuse, diffuseColor, baseColor.rgb, emissiveColor);";
+
         switch (shaderType) {
             case "vertex":
                 return {
@@ -612,18 +628,23 @@ export class MToonPluginMaterial extends MaterialPluginBase {
             case "fragment":
                 return {
                     CUSTOM_FRAGMENT_DEFINITIONS: customFragmentDefinitions,
+                    // Define mtoon specific Diffuse Color4
                     CUSTOM_FRAGMENT_BEFORE_LIGHTS: "vec4 mtoonDiffuse = vec4(0.);",
-                    CUSTOM_FRAGMENT_UPDATE_ALPHA: "baseColor.rgb = vec3(1.);", // Reset diffuseSampler
-                    // Use regexp to replace the function name
+
+                    // Reset diffuseSampler
+                    CUSTOM_FRAGMENT_UPDATE_ALPHA: "baseColor.rgb = vec3(1.);",
+
+                    // Use regexp to replace the function name for lightFragment.fx
                     "!info=computeSpotLighting": "info=computeMToonSpotLighting",
                     "!info=computeHemisphericLighting": "info=computeMToonHemisphericLighting",
                     "!info=computeLighting": "info=computeMToonLighting",
                     "!diffuseBase\\+=computeCustomDiffuseLighting\\(info,diffuseBase,shadow\\);": computeCustomDiffuseLighting,
-                    "!specularBase\\+=computeCustomSpecularLighting\\(info,specularBase,shadow\\);": "",
-                    "!vec3 finalDiffuse=clamp\\(diffuseBase*diffuseColor\\+vAmbientColor,0\\.0,1\\.0\\)*baseColor.rgb;": "vec3 finalDiffuse = computeMToonFinalDiffuse(viewDirectionW, normalW, mtoonDiffuse, diffuseColor, baseColor.rgb, emissiveColor);",
-                    "!vec3 finalDiffuse=clamp\\(\\(diffuseBase\\+emissiveColor\\)*diffuseColor+vAmbientColor,0\\.0,1\\.0\\)*baseColor.rgb;": "vec3 finalDiffuse = computeMToonFinalDiffuse(viewDirectionW, normalW, mtoonDiffuse, diffuseColor, baseColor.rgb, emissiveColor);",
-                    "!vec3 finalDiffuse=clamp\\(diffuseBase\\*diffuseColor\\+emissiveColor\\+vAmbientColor,0\\.0,1\\.0\\)\\*baseColor.rgb;": "vec3 finalDiffuse = computeMToonFinalDiffuse(viewDirectionW, normalW, mtoonDiffuse, diffuseColor, baseColor.rgb, emissiveColor);",
-                }
+
+                    // For default.fragment.fx
+                    "!vec3 finalDiffuse=clamp\\(diffuseBase*diffuseColor\\+vAmbientColor,0\\.0,1\\.0\\)*baseColor.rgb;": finalDiffuse,
+                    "!vec3 finalDiffuse=clamp\\(\\(diffuseBase\\+emissiveColor\\)*diffuseColor+vAmbientColor,0\\.0,1\\.0\\)*baseColor.rgb;": finalDiffuse,
+                    "!vec3 finalDiffuse=clamp\\(diffuseBase\\*diffuseColor\\+emissiveColor\\+vAmbientColor,0\\.0,1\\.0\\)\\*baseColor.rgb;": finalDiffuse,
+                };
         }
         return null;
     }
@@ -632,13 +653,8 @@ export class MToonPluginMaterial extends MaterialPluginBase {
      * Get active textures
      */
     private get textures(): BaseTexture[] {
-        return [
-            this.shadeMultiplyTexture,
-            this.shadingShiftTexture,
-            this.matcapTexture,
-            this.rimMultiplyTexture,
-            this.outlineWidthMultiplyTexture,
-            this.uvAnimationMaskTexture,
-        ].filter((texture) => texture !== null) as BaseTexture[];
+        return [this.shadeMultiplyTexture, this.shadingShiftTexture, this.matcapTexture, this.rimMultiplyTexture, this.outlineWidthMultiplyTexture, this.uvAnimationMaskTexture].filter(
+            (texture) => texture !== null,
+        ) as BaseTexture[];
     }
 }

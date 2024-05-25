@@ -1,0 +1,20 @@
+on:
+    push:
+        paths:
+            - package-lock.json
+            - packages/babylon-mtoon-material/**
+
+jobs:
+    ci:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Use node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+            - run: npm ci
+            - run: npm -w packages/babylon-mtoon-material run build
+            - run: npm -w packages/babylon-mtoon-material run lint

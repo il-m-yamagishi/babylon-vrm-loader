@@ -3,4 +3,4 @@
  * @author Masaru Yamagishi
  */
 
-export * from './mtoon-plugin-material';
+export * from "./mtoon-plugin-material";

@@ -1,20 +1,16 @@
-import { resolve } from "path";
+import { resolve } from "node:path";
 import { defineConfig } from "vite";
+import { externalizeDeps } from "vite-plugin-externalize-deps";
 
 export default defineConfig({
+    plugins: [
+        externalizeDeps(),
+    ],
     build: {
         lib: {
             entry: resolve(__dirname, "src", "index.ts"),
-            name: "MToonMaterial",
-            fileName: "babylon-mtoon-material",
-        },
-        rollupOptions: {
-            external: ["@babylonjs/core"],
-            output: {
-                globals: {
-                    "@babylonjs/core": "BABYLON",
-                },
-            },
+            name: "MToonPluginMaterial",
+            fileName: "babylon-mtoon-plugin-material",
         },
     },
 });
