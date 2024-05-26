@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "biomejs.biome",
+        "EditorConfig.EditorConfig",
+        "slevesque.shader",
+        "dtoplak.vscode-glsllint"
+    ]
+}

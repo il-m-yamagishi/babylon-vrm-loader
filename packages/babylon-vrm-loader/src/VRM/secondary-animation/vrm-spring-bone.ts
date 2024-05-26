@@ -63,7 +63,7 @@ export class VRMSpringBone {
             const scene = bone.getScene();
             [bone].concat(bone.getChildTransformNodes()).forEach((b) => {
                 const boneGizmo = MeshBuilder.CreateSphere(
-                    b.name + "_boneGizmo",
+                    `${b.name}_boneGizmo`,
                     {
                         segments: 6,
                         diameter: this.hitRadius * 2,
@@ -71,7 +71,7 @@ export class VRMSpringBone {
                     },
                     scene
                 );
-                const mat = new StandardMaterial(b.name + "_boneGizmomat", scene);
+                const mat = new StandardMaterial(`${b.name}_boneGizmomat`, scene);
                 mat.emissiveColor = Color3.Red();
                 mat.wireframe = true;
                 boneGizmo.material = mat;
@@ -86,7 +86,7 @@ export class VRMSpringBone {
                 const sphere = collider.sphere;
                 if (!sphere.isEnabled(false)) {
                     sphere.setEnabled(true);
-                    const mat = new StandardMaterial(group.transform.name + "_colliderGizmomat", scene);
+                    const mat = new StandardMaterial(`${group.transform.name}_colliderGizmomat`, scene);
                     mat.emissiveColor = Color3.Yellow();
                     mat.wireframe = true;
                     sphere.material = mat;

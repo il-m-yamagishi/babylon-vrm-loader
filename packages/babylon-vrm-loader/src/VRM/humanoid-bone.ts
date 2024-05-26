@@ -13,7 +13,7 @@ interface TransformNodeMap {
 
 /**
  * Methods to get transformNode of HumanoidBone(Unity)
- * @see https://docs.unity3d.com/ja/2020.3/ScriptReference/HumanBodyBones.html
+ * @see https://docs.unity3d.com/6000.0/Documentation/ScriptReference/HumanBodyBones.html
  */
 export class HumanoidBone {
     private nodeMap: Nullable<TransformNodeMap> = null;

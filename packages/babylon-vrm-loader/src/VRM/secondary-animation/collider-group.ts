@@ -5,7 +5,7 @@
 
 import type { Vector3 } from "@babylonjs/core/Maths/math";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { SphereBuilder } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Collider } from "./collider";
 
 /**
@@ -26,7 +26,7 @@ export class ColliderGroup {
      * @param radius The radius of the collider.
      */
     public addCollider(offset: Vector3, radius: number) {
-        const sphere = SphereBuilder.CreateSphere(
+        const sphere = MeshBuilder.CreateSphere(
             `${this.transform.name}_ColliderSphere`,
             {
                 segments: 6,

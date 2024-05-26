@@ -29,17 +29,8 @@ export class VRM implements IGLTFLoaderExtension {
      * @inheritdoc
      */
     public enabled = true;
-    /**
-     * この Mesh index 以降が読み込み対象
-     */
     private meshesFrom = 0;
-    /**
-     * この TransformNode index 以降が読み込み対象
-     */
     private transformNodesFrom = 0;
-    /**
-     * この Material index 以降が読み込み対象
-     */
     private materialsFrom = 0;
 
     /**
@@ -73,10 +64,13 @@ export class VRM implements IGLTFLoaderExtension {
         scene.metadata = scene.metadata || {};
         scene.metadata.vrmManagers = scene.metadata.vrmManagers || [];
         scene.metadata.vrmManagers.push(manager);
-        this.loader.babylonScene.onDisposeObservable.add(() => {
-            // Scene dispose 時に Manager も破棄する
+        const onUpdate = () => {
+            manager.update(scene.getEngine().getDeltaTime());
+        };
+        this.loader.babylonScene.onBeforeRenderObservable.add(onUpdate);
+        this.loader.babylonScene.onDisposeObservable.addOnce(() => {
+            scene.onBeforeRenderObservable.removeCallback(onUpdate);
             manager.dispose();
-            this.loader.babylonScene.metadata.vrmManagers = [];
         });
     }
 
@@ -87,7 +81,7 @@ export class VRM implements IGLTFLoaderExtension {
         if (!primitive.extras || !primitive.extras.targetNames) {
             return null;
         }
-        // まだ MorphTarget が生成されていないので、メタ情報にモーフターゲット情報を入れておく
+        // Since MorphTargets have not been generated yet, put morph target information in the metadata
         babylonMesh.metadata = babylonMesh.metadata || {};
         babylonMesh.metadata.vrmTargetNames = primitive.extras.targetNames;
         return null;
@@ -97,7 +91,6 @@ export class VRM implements IGLTFLoaderExtension {
      * @inheritdoc
      */
     public _loadMaterialAsync(context: string, material: IMaterial, mesh: Mesh, babylonDrawMode: number, assign: (babylonMaterial: Material) => void): Nullable<Promise<Material>> {
-        // ジェネレータでマテリアルを生成する
         return new VRMMaterialGenerator(this.loader).generate(context, material, mesh, babylonDrawMode, assign);
     }
 }

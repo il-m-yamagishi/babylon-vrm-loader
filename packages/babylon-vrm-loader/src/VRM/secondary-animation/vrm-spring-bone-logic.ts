@@ -126,35 +126,26 @@ export class VRMSpringBoneLogic {
         this.getMatrixWorldToCenter(_matB);
         this.getParentMatrixWorld().multiplyToRef(_matB, _matB);
 
+        // @link https://github.com/vrm-c/UniVRM/blob/master/Assets/VRM/Runtime/SpringBone/VRMSpringBone.cs#L94
         // verlet積分で次の位置を計算
         this.nextTail.copyFrom(this.currentTail);
-        {
-            // 減衰付きで前のフレームの移動を継続
-            _v3A.copyFrom(this.currentTail)
-                .subtractInPlace(this.prevTail)
-                .scaleInPlace(1.0 - dragForce);
-            this.nextTail.addInPlace(_v3A);
-        }
-        {
-            // 親の回転による子ボーンの移動目標
-            _v3A.copyFrom(this.boneAxis);
-            Vector3.TransformCoordinatesToRef(_v3A, this.initialLocalMatrix, _v3A);
-            Vector3.TransformCoordinatesToRef(_v3A, _matB, _v3A);
-            _v3A.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(stiffnessForce);
-            this.nextTail.addInPlace(_v3A);
-        }
-        {
-            // 外力による移動量
-            this.nextTail.addInPlace(external);
-        }
-        {
-            // 長さを boneLength に強制
-            this.nextTail.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition);
-        }
-        {
-            // Collision で移動
-            this.collide(colliderGroups, this.nextTail);
-        }
+        // 減衰付きで前のフレームの移動を継続
+        _v3A.copyFrom(this.currentTail)
+            .subtractInPlace(this.prevTail)
+            .scaleInPlace(1.0 - dragForce);
+        this.nextTail.addInPlace(_v3A);
+        // 親の回転による子ボーンの移動目標
+        _v3A.copyFrom(this.boneAxis);
+        Vector3.TransformCoordinatesToRef(_v3A, this.initialLocalMatrix, _v3A);
+        Vector3.TransformCoordinatesToRef(_v3A, _matB, _v3A);
+        _v3A.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(stiffnessForce);
+        this.nextTail.addInPlace(_v3A);
+        // 外力による移動量
+        this.nextTail.addInPlace(external);
+        // 長さを boneLength に強制
+        this.nextTail.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition);
+        // Collision で移動
+        this.collide(colliderGroups, this.nextTail);
 
         this.prevTail.copyFrom(this.currentTail);
         this.currentTail.copyFrom(this.nextTail);
@@ -165,7 +156,9 @@ export class VRMSpringBoneLogic {
         _v3A.normalizeToRef(_v3B);
         Quaternion.FromUnitVectorsToRef(this.boneAxis, _v3B, _quatA);
         const applyRotation = _quatA;
-        this.initialLocalRotation.multiplyToRef(applyRotation, this.transform.rotationQuaternion!);
+        if (this.transform.rotationQuaternion) {
+            this.initialLocalRotation.multiplyToRef(applyRotation, this.transform.rotationQuaternion);
+        }
 
         // update WorldMatrix
         this.transform.computeWorldMatrix(true);

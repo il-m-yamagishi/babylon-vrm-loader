@@ -7,21 +7,18 @@ import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { GLTFFileLoader } from "@babylonjs/loaders/glTF/glTFFileLoader";
 
 /**
- * File loader for VRM supports .vrm and .vci
+ * File loader for VCI supports  .vci
  */
-export class VRMFileLoader extends GLTFFileLoader {
-    public override name = "vrm";
+export class VCIFileLoader extends GLTFFileLoader {
+    public override name = "vci";
     public override extensions = {
-        ".vrm": { isBinary: true },
         ".vci": { isBinary: true },
     };
 
     public override createPlugin() {
-        return new VRMFileLoader();
+        return new VCIFileLoader();
     }
 }
 
 // Has side-effect
-if (SceneLoader) {
-    SceneLoader.RegisterPlugin(new VRMFileLoader());
-}
+SceneLoader.RegisterPlugin(new VCIFileLoader());

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Babylon.js VRM Loader Test Sandbox</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        #wrapper {
+            width: 100%;
+            height: 100%;
+        }
+
+        #main-canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <input id="file-input" type="file" accept=".vci,.vrm">
+    </nav>
+    <main id="wrapper">
+        <canvas id="main-canvas"></canvas>
+    </main>
+    <script type="module" src="/index.ts"></script>
+</body>
+
+</html>

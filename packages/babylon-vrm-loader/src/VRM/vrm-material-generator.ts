@@ -3,17 +3,17 @@
  * @author Masaru Yamagishi
  */
 
-import type { Material } from "@babylonjs/core/Materials/material";
+import { Engine } from "@babylonjs/core/Engines/engine";
 import type { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { Color3 } from "@babylonjs/core/Maths/math";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { Nullable } from "@babylonjs/core/types";
 import type { GLTFLoader, IMaterial } from "@babylonjs/loaders/glTF/2.0";
-import { MToonMaterial } from "@m-yamagishi/babylon-mtoon-material";
+import { MToonPluginMaterial } from "@m-yamagishi/babylon-mtoon-material";
 import type { IVRMMaterialProperty, IVRMVectorMaterialProperty } from "./vrm-interfaces";
 import { IVRMMaterialPropertyShader } from "./vrm-interfaces";
-import { Engine } from "@babylonjs/core/Engines/engine";
 
 /**
  * VRM で指定される Material を生成する

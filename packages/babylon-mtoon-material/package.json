@@ -27,6 +27,7 @@
     "type": "module",
     "browser": "dist/babylon-mtoon-plugin-material.umd.cjs",
     "module": "dist/babylon-mtoon-plugin-material.js",
+    "types": "types/src/index.d.ts",
     "exports": {
         ".": {
             "import": "./dist/babylon-mtoon-plugin-material.js",

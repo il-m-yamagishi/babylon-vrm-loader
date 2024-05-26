@@ -3,8 +3,8 @@
  * @author Masaru Yamagishi
  */
 
-import type { Mesh } from "@babylonjs/core";
-import type { Vector3 } from "@babylonjs/core/Maths/math";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 /**
  * Collider

@@ -1,9 +1,14 @@
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
+import type { BaseTexture, Material, Nullable, Texture } from "@babylonjs/core";
+import { PBRMaterial } from "@babylonjs/core";
 import type { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector4 } from "@babylonjs/core/Maths/math";
-import type { Material, BaseTexture, Texture, Nullable } from "@babylonjs/core";
-import { PBRMaterial } from "@babylonjs/core";
+import { MToonPluginMaterial } from "@m-yamagishi/babylon-mtoon-material";
 import type { IVRMBlendShapeMaterialBind } from "./vrm-interfaces";
-import { MToonMaterial } from "@m-yamagishi/babylon-mtoon-material";
 
 type SupportedMaterial = MToonMaterial | PBRMaterial;
 

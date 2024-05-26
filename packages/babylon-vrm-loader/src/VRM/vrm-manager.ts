@@ -9,10 +9,10 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { MorphTarget } from "@babylonjs/core/Morph/morphTarget";
 import type { Scene } from "@babylonjs/core/scene";
 import type { Nullable } from "@babylonjs/core/types";
-import { SpringBoneController } from "./secondary-animation/spring-bone-controller";
 import { HumanoidBone } from "./humanoid-bone";
-import type { IVRM } from "./vrm-interfaces";
 import { MaterialValueBindingMerger } from "./material-value-binding-merger";
+import { SpringBoneController } from "./secondary-animation/spring-bone-controller";
+import type { IVRM } from "./vrm-interfaces";
 
 interface IsBinaryMap {
     [morphName: string]: boolean;

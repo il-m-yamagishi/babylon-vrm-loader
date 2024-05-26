@@ -8,7 +8,7 @@ import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { Nullable } from "@babylonjs/core/types";
 import type { IGLTFLoaderExtension, IMaterial } from "@babylonjs/loaders/glTF/2.0";
 import { GLTFLoader } from "@babylonjs/loaders/glTF/2.0";
-import { VRMMaterialGenerator } from "./vrm-material-generator";
+import { VRMMaterialGenerator } from "../VRM/vrm-material-generator";
 
 /**
  * `extensions` key

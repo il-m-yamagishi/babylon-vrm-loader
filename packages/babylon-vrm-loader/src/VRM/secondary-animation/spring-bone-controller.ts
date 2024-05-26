@@ -3,7 +3,7 @@
  * @author Masaru Yamagishi
  */
 
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Nullable } from "@babylonjs/core/types";
 import type { IVRMSecondaryAnimation } from "../vrm-interfaces";
@@ -44,10 +44,10 @@ export class SpringBoneController {
      * @see https://docs.unity3d.com/ScriptReference/Time-deltaTime.html
      */
     public async update(deltaTime: number): Promise<void> {
-        // ポーズ後のあらぶり防止のため clamp
-        deltaTime = Math.max(0.0, Math.min(16.666, deltaTime)) / 1000;
+        // clamp for pose/unpose
+        const clampedDeltaTime = Math.max(0.0, Math.min(16.666, deltaTime)) / 1000;
         const promises = this.springs.map<Promise<void>>((spring) => {
-            return spring.update(deltaTime);
+            return spring.update(clampedDeltaTime);
         });
         return Promise.all(promises).then(() => {
             /* Do nothing */
@@ -64,7 +64,7 @@ export class SpringBoneController {
             const g = new ColliderGroup(bone);
             colliderGroup.colliders.forEach((collider) => {
                 g.addCollider(
-                    // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
+                    // Convert from VRM right-handed Y_UP, -Z_Front to Babylon.js left-handed Y_UP, +Z_Front
                     new Vector3(-collider.offset.x, collider.offset.y, -collider.offset.z),
                     collider.radius
                 );
@@ -92,7 +92,7 @@ export class SpringBoneController {
                     spring.stiffiness,
                     spring.gravityPower,
                     new Vector3(
-                        // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
+                        // Convert from VRM right-handed Y_UP, -Z_Front to Babylon.js left-handed Y_UP, +Z_Front
                         -spring.gravityDir.x,
                         spring.gravityDir.y,
                         -spring.gravityDir.z
