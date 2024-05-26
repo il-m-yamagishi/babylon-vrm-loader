@@ -44,7 +44,7 @@ interface MeshCache {
 }
 
 /**
- * Unity Humanoid Bone 名
+ * Unity Humanoid Bone name
  */
 export type HumanBoneName =
     | "hips"
@@ -105,7 +105,7 @@ export type HumanBoneName =
     | string;
 
 /**
- * VRM キャラクターを動作させるためのマネージャ
+ * Manager for VRM
  */
 export class VRMManager {
     private isBinaryMorphMap: IsBinaryMap = {};
@@ -116,20 +116,20 @@ export class VRMManager {
     private transformNodeCache: TransformNodeCache = {};
     private meshCache: MeshCache = {};
     private _humanoidBone: HumanoidBone;
-    private _rootMesh: Mesh;
+    private _rootMesh?: Nullable<Mesh>;
 
     /**
-     * Secondary Animation として定義されている VRM Spring Bone のコントローラ
+     * Secondary Animation controller
      */
     public readonly springBoneController: SpringBoneController;
 
     /**
      *
-     * @param ext glTF.extensions.VRM の中身 json
+     * @param ext glTF.extensions.VRM json
      * @param scene
-     * @param meshesFrom この番号以降のメッシュがこの VRM に該当する
-     * @param transformNodesFrom この番号以降の TransformNode がこの VRM に該当する
-     * @param materialsNodesFrom この番号以降の Material がこの VRM に該当する
+     * @param meshesFrom
+     * @param transformNodesFrom
+     * @param materialsNodesFrom
      */
     public constructor(
         public readonly ext: IVRM,
@@ -142,7 +142,7 @@ export class VRMManager {
         this.transformNodeCache = this.constructTransformNodeCache();
         this.springBoneController = new SpringBoneController(this.ext.secondaryAnimation, this.findTransformNode.bind(this));
 
-        if (this.ext.blendShapeMaster && this.ext.blendShapeMaster.blendShapeGroups) {
+        if (this.ext.blendShapeMaster?.blendShapeGroups) {
             this.constructIsBinaryMap();
             this.constructMorphTargetMap();
             this.constructMaterialValueBindingMergerMap();
@@ -153,9 +153,9 @@ export class VRMManager {
     }
 
     /**
-     * Secondary Animation を更新する
+     * Update Secondary Animation
      *
-     * @param deltaTime 前フレームからの経過秒数(sec)
+     * @param deltaTime The elapsed time in seconds since the previous frame(sec)
      */
     public async update(deltaTime: number): Promise<void> {
         await this.springBoneController.update(deltaTime);
@@ -168,19 +168,19 @@ export class VRMManager {
         this.springBoneController.dispose();
         this._humanoidBone.dispose();
 
-        (this.morphTargetMap as any) = null;
-        (this.materialValueBindingMergerMap as any) = null;
-        (this.presetMorphTargetMap as any) = null;
-        (this.transformNodeMap as any) = null;
-        (this.transformNodeCache as any) = null;
-        (this.meshCache as any) = null;
-        (this._rootMesh as any) = null;
+        this.morphTargetMap = {};
+        this.materialValueBindingMergerMap = {};
+        this.presetMorphTargetMap = {};
+        this.transformNodeMap = {};
+        this.transformNodeCache = {};
+        this.meshCache = {};
+        this._rootMesh = null;
     }
 
     /**
-     * モーフィングを行う
-     * @param label モーフ名
-     * @param value 値(0〜1)
+     * Morph
+     * @param label morph label
+     * @param value value(0〜1)
      */
     public morphing(label: string, value: number): void {
         const v = this.calcMorphValue(label, value);
@@ -195,9 +195,9 @@ export class VRMManager {
     }
 
     /**
-     * プリセットモーフのモーフィングを行う
-     * @param label モーフ名
-     * @param value 値(0〜1)
+     * Preset morph
+     * @param label morph label
+     * @param value value(0〜1)
      */
     public morphingPreset(label: string, value: number): void {
         if (!this.presetMorphTargetMap[label]) {
@@ -210,9 +210,9 @@ export class VRMManager {
     }
 
     /**
-     * モーフィング用の値を計算する
-     * @param label モーフ名
-     * @param value 値
+     * Calculate value for morph
+     * @param label morph label
+     * @param value value
      */
     private calcMorphValue(label: string, value: number): number {
         const v = Math.max(0.0, Math.min(1.0, value));
@@ -230,11 +230,9 @@ export class VRMManager {
     }
 
     /**
-     * 一人称時のカメラ位置を絶対座標として取得する
+     * Get absolute camera position for first person view
      *
-     * firstPersonBone が未設定の場合は null を返す
-     *
-     * @returns 一人称時のカメラの現在における絶対座標
+     * Returns null when there is no firstPersonBone
      */
     public getFirstPersonCameraPosition(): Nullable<Vector3> {
         const firstPersonBone = this.getFirstPersonBone();
@@ -248,20 +246,10 @@ export class VRMManager {
     }
 
     /**
-     * 一人称時に頭とみなす TransformNode を取得する
+     * Get TransformNode as head in first person view
      */
     public getFirstPersonBone(): Nullable<TransformNode> {
         return this.findTransformNode(this.ext.firstPerson.firstPersonBone);
-    }
-
-    /**
-     * ボーン名からそのボーンに該当する TransformNode を取得する
-     *
-     * @param name HumanBoneName
-     * @deprecated Use humanoidBone getter instead. This method will delete at v2.
-     */
-    public getBone(name: HumanBoneName): Nullable<TransformNode> {
-        return this.transformNodeMap[name] || null;
     }
 
     /**
@@ -277,13 +265,16 @@ export class VRMManager {
      * Useful for Model Transformation
      */
     public get rootMesh(): Mesh {
+        if (!this._rootMesh) {
+            throw new Error("Root mesh is not found");
+        }
         return this._rootMesh;
     }
 
     /**
-     * node 番号から該当する TransformNode を探す
-     * 数が多くなるのでキャッシュに参照を持つ構造にする
-     * gltf の node 番号は `metadata.gltf.pointers` に記録されている
+     * Find the corresponding TransformNode from the node index
+     * Since there can be a large number of nodes, it is structured to hold references in a cache
+     * The node index in gltf is recorded in `metadata.gltf.pointers`
      * @param nodeIndex
      */
     public findTransformNode(nodeIndex: number): Nullable<TransformNode> {
@@ -291,24 +282,15 @@ export class VRMManager {
     }
 
     /**
-     * mesh 番号からメッシュを探す
-     * gltf の mesh 番号は `metadata.gltf.pointers` に記録されている
-     * @deprecated Use findMeshes instead. This method has broken.
-     */
-    public findMesh(meshIndex: number): Nullable<Mesh> {
-        return (this.meshCache[meshIndex] && this.meshCache[meshIndex][0]) || null;
-    }
-
-    /**
-     * mesh 番号からメッシュを探す
-     * gltf の mesh 番号は `metadata.gltf.pointers` に記録されている
+     * Find the corresponding Meshes from the mesh index
+     * The mesh index in gltf is recorded in `metadata.gltf.pointers`
      */
     public findMeshes(meshIndex: number): Nullable<Mesh[]> {
         return this.meshCache[meshIndex] || null;
     }
 
     /**
-     * 事前に MorphTarget と isBinary を紐付ける
+     * Prepare binary map
      */
     private constructIsBinaryMap(): void {
         this.ext.blendShapeMaster.blendShapeGroups.forEach((g) => {
@@ -317,7 +299,7 @@ export class VRMManager {
     }
 
     /**
-     * 事前に MorphTarget と BlendShape を紐付ける
+     * Prepare morph target map
      */
     private constructMorphTargetMap(): void {
         this.ext.blendShapeMaster.blendShapeGroups.forEach((g) => {
@@ -327,13 +309,13 @@ export class VRMManager {
             g.binds.forEach((b) => {
                 const meshes = this.findMeshes(b.mesh);
                 if (!meshes) {
-                    console.log(`Undefined BlendShapeBind Mesh`, b);
+                    console.log("Undefined BlendShapeBind Mesh", b);
                     return;
                 }
                 meshes.forEach((mesh) => {
                     const morphTargetManager = mesh.morphTargetManager;
                     if (!morphTargetManager) {
-                        console.log(`Undefined morphTargetManager`, b);
+                        console.log("Undefined morphTargetManager", b);
                         return;
                     }
                     const target = morphTargetManager.getTarget(b.index);
@@ -355,7 +337,7 @@ export class VRMManager {
     }
 
     /**
-     * 事前に MaterialValueBindingMerger とモーフ名を紐付ける
+     * Prepare MaterialValueBindingMerger map
      */
     private constructMaterialValueBindingMergerMap() {
         const materials = this.scene.materials.slice(this.materialsNodesFrom);
@@ -368,7 +350,7 @@ export class VRMManager {
     }
 
     /**
-     * 事前に TransformNode と bone 名を紐づける
+     * Prepare TransformNode map
      */
     private constructTransformNodeMap() {
         this.ext.humanoid.humanBones.forEach((b) => {
@@ -381,19 +363,19 @@ export class VRMManager {
     }
 
     /**
-     * node 番号と TransformNode を紐づける
+     * Prepare TransformNode
      */
     private constructTransformNodeCache() {
         const cache: TransformNodeCache = {};
         for (let index = this.transformNodesFrom; index < this.scene.transformNodes.length; index++) {
             const node = this.scene.transformNodes[index];
-            // ポインタが登録されていないものは省略
+            // Skip when no pointers are registered
             if (!node || !node.metadata || !node.metadata.gltf || !node.metadata.gltf.pointers || node.metadata.gltf.pointers.length === 0) {
                 continue;
             }
             for (const pointer of node.metadata.gltf.pointers) {
                 if (pointer.startsWith("/nodes/")) {
-                    const nodeIndex = parseInt((pointer as string).substr(7), 10);
+                    const nodeIndex = Number.parseInt((pointer as string).slice(7), 10);
                     cache[nodeIndex] = node;
                     break;
                 }
@@ -403,7 +385,7 @@ export class VRMManager {
     }
 
     /**
-     * mesh 番号と Mesh を紐づける
+     * Prepare mesh
      */
     private constructMeshCache() {
         const cache: MeshCache = {};
@@ -413,14 +395,14 @@ export class VRMManager {
                 this._rootMesh = mesh as Mesh;
                 continue;
             }
-            // ポインタが登録されていないものは省略
+            // Skip when no pointers are registered
             if (!mesh || !mesh.metadata || !mesh.metadata.gltf || !mesh.metadata.gltf.pointers || mesh.metadata.gltf.pointers.length === 0) {
                 continue;
             }
             for (const pointer of mesh.metadata.gltf.pointers) {
                 const match = (pointer as string).match(/^\/meshes\/(\d+).+$/);
                 if (match) {
-                    const nodeIndex = parseInt(match[1], 10);
+                    const nodeIndex = Number.parseInt(match[1], 10);
                     cache[nodeIndex] = cache[nodeIndex] || [];
                     cache[nodeIndex].push(mesh as Mesh);
                     break;

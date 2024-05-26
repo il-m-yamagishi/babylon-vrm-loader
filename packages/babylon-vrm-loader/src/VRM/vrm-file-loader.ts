@@ -13,7 +13,6 @@ export class VRMFileLoader extends GLTFFileLoader {
     public override name = "vrm";
     public override extensions = {
         ".vrm": { isBinary: true },
-        ".vci": { isBinary: true },
     };
 
     public override createPlugin() {
