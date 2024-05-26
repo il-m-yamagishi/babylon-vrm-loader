@@ -1,13 +1,18 @@
-import { Vector3 } from '@babylonjs/core/Maths/math';
-import type { Mesh } from '@babylonjs/core/Meshes/mesh';
-import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import type { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
-import type { Scene } from '@babylonjs/core/scene';
-import type { Nullable } from '@babylonjs/core/types';
-import { SpringBoneController } from './secondary-animation/spring-bone-controller';
-import { HumanoidBone } from './humanoid-bone';
-import type { IVRM } from './vrm-interfaces';
-import { MaterialValueBindingMerger } from './material-value-binding-merger';
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
+import { Vector3 } from "@babylonjs/core/Maths/math";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { MorphTarget } from "@babylonjs/core/Morph/morphTarget";
+import type { Scene } from "@babylonjs/core/scene";
+import type { Nullable } from "@babylonjs/core/types";
+import { SpringBoneController } from "./secondary-animation/spring-bone-controller";
+import { HumanoidBone } from "./humanoid-bone";
+import type { IVRM } from "./vrm-interfaces";
+import { MaterialValueBindingMerger } from "./material-value-binding-merger";
 
 interface IsBinaryMap {
     [morphName: string]: boolean;
@@ -42,61 +47,61 @@ interface MeshCache {
  * Unity Humanoid Bone 名
  */
 export type HumanBoneName =
-    | 'hips'
-    | 'leftUpperLeg'
-    | 'rightUpperLeg'
-    | 'leftLowerLeg'
-    | 'rightLowerLeg'
-    | 'leftFoot'
-    | 'rightFoot'
-    | 'spine'
-    | 'chest'
-    | 'neck'
-    | 'head'
-    | 'leftShoulder'
-    | 'rightShoulder'
-    | 'leftUpperArm'
-    | 'rightUpperArm'
-    | 'leftLowerArm'
-    | 'rightLowerArm'
-    | 'leftHand'
-    | 'rightHand'
-    | 'leftToes'
-    | 'rightToes'
-    | 'leftEye'
-    | 'rightEye'
-    | 'jaw'
-    | 'leftThumbProximal'
-    | 'leftThumbIntermediate'
-    | 'leftThumbDistal'
-    | 'leftIndexProximal'
-    | 'leftIndexIntermediate'
-    | 'leftIndexDistal'
-    | 'leftMiddleProximal'
-    | 'leftMiddleIntermediate'
-    | 'leftMiddleDistal'
-    | 'leftRingProximal'
-    | 'leftRingIntermediate'
-    | 'leftRingDistal'
-    | 'leftLittleProximal'
-    | 'leftLittleIntermediate'
-    | 'leftLittleDistal'
-    | 'rightThumbProximal'
-    | 'rightThumbIntermediate'
-    | 'rightThumbDistal'
-    | 'rightIndexProximal'
-    | 'rightIndexIntermediate'
-    | 'rightIndexDistal'
-    | 'rightMiddleProximal'
-    | 'rightMiddleIntermediate'
-    | 'rightMiddleDistal'
-    | 'rightRingProximal'
-    | 'rightRingIntermediate'
-    | 'rightRingDistal'
-    | 'rightLittleProximal'
-    | 'rightLittleIntermediate'
-    | 'rightLittleDistal'
-    | 'upperChest'
+    | "hips"
+    | "leftUpperLeg"
+    | "rightUpperLeg"
+    | "leftLowerLeg"
+    | "rightLowerLeg"
+    | "leftFoot"
+    | "rightFoot"
+    | "spine"
+    | "chest"
+    | "neck"
+    | "head"
+    | "leftShoulder"
+    | "rightShoulder"
+    | "leftUpperArm"
+    | "rightUpperArm"
+    | "leftLowerArm"
+    | "rightLowerArm"
+    | "leftHand"
+    | "rightHand"
+    | "leftToes"
+    | "rightToes"
+    | "leftEye"
+    | "rightEye"
+    | "jaw"
+    | "leftThumbProximal"
+    | "leftThumbIntermediate"
+    | "leftThumbDistal"
+    | "leftIndexProximal"
+    | "leftIndexIntermediate"
+    | "leftIndexDistal"
+    | "leftMiddleProximal"
+    | "leftMiddleIntermediate"
+    | "leftMiddleDistal"
+    | "leftRingProximal"
+    | "leftRingIntermediate"
+    | "leftRingDistal"
+    | "leftLittleProximal"
+    | "leftLittleIntermediate"
+    | "leftLittleDistal"
+    | "rightThumbProximal"
+    | "rightThumbIntermediate"
+    | "rightThumbDistal"
+    | "rightIndexProximal"
+    | "rightIndexIntermediate"
+    | "rightIndexDistal"
+    | "rightMiddleProximal"
+    | "rightMiddleIntermediate"
+    | "rightMiddleDistal"
+    | "rightRingProximal"
+    | "rightRingIntermediate"
+    | "rightRingDistal"
+    | "rightLittleProximal"
+    | "rightLittleIntermediate"
+    | "rightLittleDistal"
+    | "upperChest"
     | string;
 
 /**
@@ -387,7 +392,7 @@ export class VRMManager {
                 continue;
             }
             for (const pointer of node.metadata.gltf.pointers) {
-                if (pointer.startsWith('/nodes/')) {
+                if (pointer.startsWith("/nodes/")) {
                     const nodeIndex = parseInt((pointer as string).substr(7), 10);
                     cache[nodeIndex] = node;
                     break;
@@ -404,7 +409,7 @@ export class VRMManager {
         const cache: MeshCache = {};
         for (let index = this.meshesFrom; index < this.scene.meshes.length; index++) {
             const mesh = this.scene.meshes[index];
-            if (mesh.id === '__root__') {
+            if (mesh.id === "__root__") {
                 this._rootMesh = mesh as Mesh;
                 continue;
             }

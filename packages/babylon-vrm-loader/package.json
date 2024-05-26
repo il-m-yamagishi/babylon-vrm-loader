@@ -29,10 +29,16 @@
         "@babylonjs/inspector": "^7.2.2",
         "@babylonjs/loaders": "^7.2.2",
         "@babylonjs/serializers": "^7.2.2",
+        "@m-yamagishi/babylon-mtoon-material": "*",
         "babylonjs-gltf2interface": "^7.2.2",
         "typescript": "~5.4.5",
         "vite": "^5.2.11",
         "vite-plugin-externalize-deps": "^0.8.0"
+    },
+    "peerDependencies": {
+        "@babylonjs/core": "^7.2.2",
+        "@babylonjs/loaders": "^7.2.2",
+        "@m-yamagishi/babylon-mtoon-material": "*"
     },
     "scripts": {
         "dev": "vite",
@@ -50,31 +56,16 @@
     ],
     "config": {
         "commitizen": {
-            "path": "./node_modules/cz-conventional-changelog"
+            "path": "cz-conventional-changelog"
         }
     },
     "release": {
         "plugins": [
             "@semantic-release/commit-analyzer",
             "@semantic-release/release-notes-generator",
-            [
-                "@semantic-release/github",
-                {
-                    "assets": [
-                        [
-                            "dist/index.js",
-                            "dist/index.module.js"
-                        ]
-                    ]
-                }
-            ],
+            "@semantic-release/github",
             "@semantic-release/npm",
             "@semantic-release/git"
         ]
-    },
-    "peerDependencies": {
-        "@babylonjs/core": "^7.2.2",
-        "@babylonjs/loaders": "^7.2.2",
-        "@m-yamagishi/babylon-mtoon-material": "*"
     }
 }

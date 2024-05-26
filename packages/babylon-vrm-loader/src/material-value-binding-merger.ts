@@ -1,9 +1,9 @@
-import type { Color3 } from '@babylonjs/core/Maths/math';
-import { Vector4 } from '@babylonjs/core/Maths/math';
-import type { Material, BaseTexture, Texture, Nullable } from '@babylonjs/core';
-import { PBRMaterial } from '@babylonjs/core';
-import type { IVRMBlendShapeMaterialBind } from './vrm-interfaces';
-import { MToonMaterial } from 'babylon-mtoon-material';
+import type { Color3 } from "@babylonjs/core/Maths/math";
+import { Vector4 } from "@babylonjs/core/Maths/math";
+import type { Material, BaseTexture, Texture, Nullable } from "@babylonjs/core";
+import { PBRMaterial } from "@babylonjs/core";
+import type { IVRMBlendShapeMaterialBind } from "./vrm-interfaces";
+import { MToonMaterial } from "@m-yamagishi/babylon-mtoon-material";
 
 type SupportedMaterial = MToonMaterial | PBRMaterial;
 
@@ -13,32 +13,32 @@ type SupportedMaterial = MToonMaterial | PBRMaterial;
 type Setter = (value: number, firstValue: boolean) => void;
 
 const PBRMaterialTextureMap: { [propertyName: string]: keyof PBRMaterial } = {
-    _MainTex: 'albedoTexture',
+    _MainTex: "albedoTexture",
 };
 
 const PBRMaterialColorMap: { [propertyName: string]: keyof PBRMaterial } = {
-    _Color: 'albedoColor',
+    _Color: "albedoColor",
 };
 
 const MToonMaterialTextureMap: { [propertyName: string]: keyof MToonMaterial } = {
-    _MainTex: 'diffuseTexture',
-    _EmissionMap: 'emissiveTexture',
-    _BumpMap: 'bumpTexture',
-    _ShadeTexture: 'shadeTexture',
-    _ReceiveShadowTexture: 'receiveShadowTexture',
-    _ShadingGradeTexture: 'shadingGradeTexture',
-    _RimTexture: 'rimTexture',
-    _SphereAdd: 'matCapTexture',
-    _OutlineWidthTexture: 'outlineWidthTexture',
-    _UvAnimMaskTexture: 'uvAnimationMaskTexture',
+    _MainTex: "diffuseTexture",
+    _EmissionMap: "emissiveTexture",
+    _BumpMap: "bumpTexture",
+    _ShadeTexture: "shadeTexture",
+    _ReceiveShadowTexture: "receiveShadowTexture",
+    _ShadingGradeTexture: "shadingGradeTexture",
+    _RimTexture: "rimTexture",
+    _SphereAdd: "matCapTexture",
+    _OutlineWidthTexture: "outlineWidthTexture",
+    _UvAnimMaskTexture: "uvAnimationMaskTexture",
 };
 
 const MToonMaterialColorMap: { [propertyName: string]: keyof MToonMaterial } = {
-    _Color: 'diffuseColor',
-    _ShadeColor: 'shadeColor',
-    _RimColor: 'rimColor',
-    _EmissionColor: 'emissiveColor',
-    _OutlineColor: 'outlineColor',
+    _Color: "diffuseColor",
+    _ShadeColor: "shadeColor",
+    _RimColor: "rimColor",
+    _EmissionColor: "emissiveColor",
+    _OutlineColor: "outlineColor",
 };
 
 /**
@@ -94,7 +94,7 @@ export class MaterialValueBindingMerger {
             } else if (Object.keys(MToonMaterialTextureMap).some((k) => valueName.startsWith(k))) {
                 targetValue.w *= -1;
             }
-            if (valueName.endsWith('_ST_S')) {
+            if (valueName.endsWith("_ST_S")) {
                 // テクスチャの u方向 のみ更新する
                 const setter: Setter = (value, firstValue) => {
                     const propValue = firstValue
@@ -106,7 +106,7 @@ export class MaterialValueBindingMerger {
                     this.updateMaterialProperty(material, valueName, src);
                 };
                 this.m_materialSetterMap[bindingKey] = setter;
-            } else if (valueName.endsWith('_ST_T')) {
+            } else if (valueName.endsWith("_ST_T")) {
                 // テクスチャの v方向 のみ更新する
                 const setter: Setter = (value, firstValue) => {
                     const propValue = firstValue
@@ -135,7 +135,7 @@ export class MaterialValueBindingMerger {
      * MaterialValueBinding.BaseValue は対応するプロパティの初期値なので無視できる
      */
     private makeBindingKey(materialValue: IVRMBlendShapeMaterialBind): string {
-        return `${materialValue.materialName}_${materialValue.propertyName}_${materialValue.targetValue.join('-')}`;
+        return `${materialValue.materialName}_${materialValue.propertyName}_${materialValue.targetValue.join("-")}`;
     }
 
     /**
@@ -182,11 +182,11 @@ export class MaterialValueBindingMerger {
 
                 // 対象のプロパティを初期値に戻す
                 const valueName = materialValue.propertyName;
-                if (valueName.endsWith('_ST_S')) {
+                if (valueName.endsWith("_ST_S")) {
                     const v = this.getMaterialProperty(material, valueName)!;
                     value.y = v.y;
                     value.w = v.w;
-                } else if (valueName.endsWith('_ST_T')) {
+                } else if (valueName.endsWith("_ST_T")) {
                     const v = this.getMaterialProperty(material, valueName)!;
                     value.x = v.x;
                     value.z = v.z;
@@ -266,7 +266,7 @@ export class MaterialValueBindingMerger {
                 return;
             }
             if (PBRMaterialColorMap[key]) {
-                if (key === '_Color') {
+                if (key === "_Color") {
                     material.alpha = value.w;
                 }
                 this.updateColor(material[PBRMaterialColorMap[key]], value);
@@ -279,7 +279,7 @@ export class MaterialValueBindingMerger {
             return;
         }
         if (MToonMaterialColorMap[key]) {
-            if (key === '_Color') {
+            if (key === "_Color") {
                 material.alpha = value.w;
             }
             this.updateColor(material[MToonMaterialColorMap[key]], value);

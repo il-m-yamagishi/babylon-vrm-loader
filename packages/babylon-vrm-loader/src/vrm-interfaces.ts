@@ -1,3 +1,8 @@
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
 export interface IVRMVector3 {
     x: number;
     y: number;
@@ -73,7 +78,7 @@ export interface IVRMFirstPerson {
     firstPersonBone: number;
     firstPersonBoneOffset: IVRMVector3;
     meshAnnotations: IVRMFirstPersonMeshAnnotation[];
-    lookAtTypeName: 'Bone' | 'BlendShape';
+    lookAtTypeName: "Bone" | "BlendShape";
     lookAtHorizontalInner: IVRMFirstPersonDegreeMap;
     lookAtHorizontalOuter: IVRMFirstPersonDegreeMap;
     lookAtVerticalDown: IVRMFirstPersonDegreeMap;
@@ -138,9 +143,9 @@ export interface IVRMSecondaryAnimation {
 }
 
 export enum IVRMMaterialPropertyShader {
-    VRM_USE_GLTFSHADER = 'VRM_USE_GLTFSHADER',
-    VRMMToon = 'VRM/MToon',
-    VRMUnlitTransparentZWrite = 'VRM/UnlitTransparentZWrite',
+    VRM_USE_GLTFSHADER = "VRM_USE_GLTFSHADER",
+    VRMMToon = "VRM/MToon",
+    VRMUnlitTransparentZWrite = "VRM/UnlitTransparentZWrite",
 }
 
 export interface IVRMMaterialPropertyFloatProperties {
@@ -216,7 +221,7 @@ export interface IVRMMaterialPropertyKeywordMap {
 }
 
 export interface IVRMMaterialPropertyTagMap {
-    RenderType?: 'Opaque' | 'TransparentCutout' | 'Transparent';
+    RenderType?: "Opaque" | "TransparentCutout" | "Transparent";
 }
 
 /**

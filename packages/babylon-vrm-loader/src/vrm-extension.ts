@@ -1,18 +1,23 @@
-import type { Material } from '@babylonjs/core/Materials/material';
-import type { Mesh } from '@babylonjs/core/Meshes/mesh';
-import type { Nullable } from '@babylonjs/core/types';
-import type { IGLTFLoaderExtension, IMaterial, IMeshPrimitive } from '@babylonjs/loaders/glTF/2.0';
-import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0';
-import { VRMManager } from './vrm-manager';
-import { VRMMaterialGenerator } from './vrm-material-generator';
-
 /**
- * `extensions` に入る拡張キー
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
  */
-const NAME = 'VRM';
+
+import type { Material } from "@babylonjs/core/Materials/material";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { Nullable } from "@babylonjs/core/types";
+import type { IGLTFLoaderExtension, IMaterial, IMeshPrimitive } from "@babylonjs/loaders/glTF/2.0";
+import { GLTFLoader } from "@babylonjs/loaders/glTF/2.0";
+import { VRMManager } from "./vrm-manager";
+import { VRMMaterialGenerator } from "./vrm-material-generator";
 
 /**
- * VRM 拡張を処理する
+ * `extensions` key
+ */
+const NAME = "VRM";
+
+/**
+ * VRM 0.x extension
  * [Specification](https://github.com/vrm-c/vrm-specification/tree/master/specification/0.0)
  */
 export class VRM implements IGLTFLoaderExtension {
@@ -52,6 +57,7 @@ export class VRM implements IGLTFLoaderExtension {
      * @inheritdoc
      */
     public dispose(): void {
+        // biome-ignore lint/suspicious/noExplicitAny: dispose
         (this.loader as any) = null;
     }
 
@@ -96,5 +102,5 @@ export class VRM implements IGLTFLoaderExtension {
     }
 }
 
-// ローダーに登録する
+// Has side-effect
 GLTFLoader.RegisterExtension(NAME, (loader) => new VRM(loader));

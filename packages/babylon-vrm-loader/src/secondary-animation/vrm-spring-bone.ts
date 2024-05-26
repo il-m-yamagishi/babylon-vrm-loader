@@ -1,10 +1,15 @@
-import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
-import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
-import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
-import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import type { Nullable } from '@babylonjs/core/types';
-import type { ColliderGroup } from './collider-group';
-import { VRMSpringBoneLogic } from './vrm-spring-bone-logic';
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { Nullable } from "@babylonjs/core/types";
+import type { ColliderGroup } from "./collider-group";
+import { VRMSpringBoneLogic } from "./vrm-spring-bone-logic";
 
 /**
  * @see https://github.com/vrm-c/UniVRM/blob/master/Assets/VRM/UniVRM/Scripts/SpringBone/VRMSpringBone.cs
@@ -25,7 +30,7 @@ export class VRMSpringBone {
      * @param dragForce The resistance (deceleration) of automatic animation.
      * @param center The reference point of a swaying object can be set at any location except the origin.
      *               When implementing UI moving with warp,
-     *               the parent node to move with warp can be specified if you don't want to make the object swaying with warp movement.
+     *               the parent node to move with warp can be specified if you don"t want to make the object swaying with warp movement.
      * @param hitRadius The radius of the sphere used for the collision detection with colliders.
      * @param bones Specify the node index of the root bone of the swaying object.
      * @param colliderGroups Specify the index of the collider group for collisions with swaying objects.
@@ -58,7 +63,7 @@ export class VRMSpringBone {
             const scene = bone.getScene();
             [bone].concat(bone.getChildTransformNodes()).forEach((b) => {
                 const boneGizmo = MeshBuilder.CreateSphere(
-                    b.name + '_boneGizmo',
+                    b.name + "_boneGizmo",
                     {
                         segments: 6,
                         diameter: this.hitRadius * 2,
@@ -66,7 +71,7 @@ export class VRMSpringBone {
                     },
                     scene
                 );
-                const mat = new StandardMaterial(b.name + '_boneGizmomat', scene);
+                const mat = new StandardMaterial(b.name + "_boneGizmomat", scene);
                 mat.emissiveColor = Color3.Red();
                 mat.wireframe = true;
                 boneGizmo.material = mat;
@@ -81,7 +86,7 @@ export class VRMSpringBone {
                 const sphere = collider.sphere;
                 if (!sphere.isEnabled(false)) {
                     sphere.setEnabled(true);
-                    const mat = new StandardMaterial(group.transform.name + '_colliderGizmomat', scene);
+                    const mat = new StandardMaterial(group.transform.name + "_colliderGizmomat", scene);
                     mat.emissiveColor = Color3.Yellow();
                     mat.wireframe = true;
                     sphere.material = mat;

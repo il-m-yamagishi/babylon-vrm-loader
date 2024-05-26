@@ -1,7 +1,12 @@
-import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
-import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import type { Nullable } from '@babylonjs/core/types';
-import type { ColliderGroup } from './collider-group';
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { Nullable } from "@babylonjs/core/types";
+import type { ColliderGroup } from "./collider-group";
 // based on
 // http://rocketjump.skr.jp/unity3d/109/
 // https://github.com/dwango/UniVRM/blob/master/Scripts/SpringBone/VRMSpringBone.cs

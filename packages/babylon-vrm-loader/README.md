@@ -4,27 +4,26 @@
 
 ![alicia.png](alicia.png)
 
-VRM porting to babylon.js.
+Port of [VRM](https://github.com/vrm-c/vrm-specification/) to [Babylon.js](https://www.babylonjs.com/) WebGL/WebGPU.
 
 ## Features
 
 - Supports `.vrm` v0.x file loading
-    - with `extensions.VRM` glTF Extension
-    - TODO VRM v1.0 file loading
+- [ ] Supports `.vrm` v1.0 file loading
 - Supports `.vci` file loading
-- Supports [MToonMaterial](https://github.com/virtual-cast/babylon-mtoon-material)
+- Supports [MToonMaterial](../babylon-mtoon-material)
 - Get bone([TransformNode](https://doc.babylonjs.com/typedoc/classes/BABYLON.TransformNode)) from Unity Humanoid bone mapping name
-- [BlendShape](https://vrm.dev/en/univrm/blendshape/index.html) morphing
-- [SpringBone](https://vrm.dev/en/univrm/springbone/index.html)
-- Supports [VCI](https://github.com/virtual-cast/VCI) features(partial support)
-    - `VCAST_vci_material_unity`
-    - TODO: `VCAST_vci_meta`
-    - TODO: `VCAST_vci_embedded_script`
-    - TODO: `VCAST_vci_audios`
-    - TODO: `VCAST_vci_colliders`
-    - TODO: `VCAST_vci_rigidbody`
-    - TODO: `VCAST_vci_joints`
-    - TODO: `VCAST_vci_item`
+- [BlendShape](https://vrm.dev/univrm/blendshape/univrm_blendshape/) morphing
+- [SpringBone](https://vrm.dev/univrm/springbone/univrm_secondary/)
+- Partial supports [VCI](https://github.com/virtual-cast/VCI) features
+    - [x] `VCAST_vci_material_unity`
+    - [ ] `VCAST_vci_meta`
+    - [ ] `VCAST_vci_embedded_script`
+    - [ ] `VCAST_vci_audios`
+    - [ ] `VCAST_vci_colliders`
+    - [ ] `VCAST_vci_rigidbody`
+    - [ ] `VCAST_vci_joints`
+    - [ ] `VCAST_vci_item`
 
 ## Usage
 

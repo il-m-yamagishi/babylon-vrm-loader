@@ -1,9 +1,14 @@
-import type { IVRMMaterialProperty } from './vrm-interfaces';
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
+import type { IVRMMaterialProperty } from "./vrm-interfaces";
 
 export type IVCIVector3 = [number, number, number];
 
 export interface IVCIColliderDetail {
-    type: 'box' | string;
+    type: "box" | string;
     center: IVCIVector3;
     shape: IVCIVector3;
     grabable: boolean;
@@ -68,7 +73,7 @@ export interface IVCIMeta {
     scriptOtherLicenseUrl?: string;
     scriptWriteProtected: boolean;
     scriptEnableDebugging: boolean;
-    scriptFormat: 'luaText' | string;
+    scriptFormat: "luaText" | string;
 }
 
 /**
@@ -81,8 +86,8 @@ export interface IVCIEmbeddedScript {
 
 export interface IVCIEmbeddedScriptDetail {
     name: string;
-    mimeType: 'x_application_lua' | string;
-    targetEngine: 'moonsharp' | string;
+    mimeType: "x_application_lua" | string;
+    targetEngine: "moonsharp" | string;
     source: number;
 }
 

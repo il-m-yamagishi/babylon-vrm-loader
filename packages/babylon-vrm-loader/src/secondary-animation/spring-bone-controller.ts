@@ -1,9 +1,14 @@
-import { Vector3 } from '@babylonjs/core/Maths/math';
-import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import type { Nullable } from '@babylonjs/core/types';
-import type { IVRMSecondaryAnimation } from '../vrm-interfaces';
-import { ColliderGroup } from './collider-group';
-import { VRMSpringBone } from './vrm-spring-bone';
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
+import { Vector3 } from "@babylonjs/core/Maths/math";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { Nullable } from "@babylonjs/core/types";
+import type { IVRMSecondaryAnimation } from "../vrm-interfaces";
+import { ColliderGroup } from "./collider-group";
+import { VRMSpringBone } from "./vrm-spring-bone";
 
 /**
  * function to get bone from nodeIndex

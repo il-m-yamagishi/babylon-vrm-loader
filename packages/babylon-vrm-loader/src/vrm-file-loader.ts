@@ -1,22 +1,27 @@
-import { SceneLoader } from '@babylonjs/core/Loading/sceneLoader';
-import { GLTFFileLoader } from '@babylonjs/loaders/glTF/glTFFileLoader';
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { GLTFFileLoader } from "@babylonjs/loaders/glTF/glTFFileLoader";
 
 /**
- * VRM/VCI ファイルを読み込めるようにする
- * 拡張子を変更しただけ
+ * File loader for VRM supports .vrm and .vci
  */
 export class VRMFileLoader extends GLTFFileLoader {
-    public name = 'vrm';
-    public extensions = {
-        '.vrm': { isBinary: true },
-        '.vci': { isBinary: true },
+    public override name = "vrm";
+    public override extensions = {
+        ".vrm": { isBinary: true },
+        ".vci": { isBinary: true },
     };
 
-    public createPlugin() {
+    public override createPlugin() {
         return new VRMFileLoader();
     }
 }
 
+// Has side-effect
 if (SceneLoader) {
     SceneLoader.RegisterPlugin(new VRMFileLoader());
 }

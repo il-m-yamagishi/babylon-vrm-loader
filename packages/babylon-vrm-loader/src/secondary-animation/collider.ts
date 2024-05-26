@@ -1,5 +1,10 @@
-import type { Mesh } from '@babylonjs/core';
-import type { Vector3 } from '@babylonjs/core/Maths/math';
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
+import type { Mesh } from "@babylonjs/core";
+import type { Vector3 } from "@babylonjs/core/Maths/math";
 
 /**
  * Collider

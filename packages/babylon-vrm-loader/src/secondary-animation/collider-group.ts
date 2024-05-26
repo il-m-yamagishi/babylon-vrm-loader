@@ -1,7 +1,12 @@
-import type { Vector3 } from '@babylonjs/core/Maths/math';
-import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import { SphereBuilder } from '@babylonjs/core/Meshes/Builders/sphereBuilder';
-import { Collider } from './collider';
+/**
+ * @license Apache-2.0
+ * @author Masaru Yamagishi
+ */
+
+import type { Vector3 } from "@babylonjs/core/Maths/math";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { SphereBuilder } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
+import { Collider } from "./collider";
 
 /**
  * VRM SpringBone ColliderGroup

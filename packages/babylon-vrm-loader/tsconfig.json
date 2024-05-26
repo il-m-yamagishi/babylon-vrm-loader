@@ -2,25 +2,35 @@
     "compilerOptions": {
         "importHelpers": true,
         "moduleResolution": "node",
-        "module": "esNext",
-        "target": "es2017",
+        "module": "ES2020",
+        "target": "es2021",
+        "emitDeclarationOnly": true,
         "declaration": true,
+        "declarationMap": true,
+        "declarationDir": "./types",
         "sourceMap": true,
+        "inlineSources": true,
         "experimentalDecorators": true,
         "noImplicitAny": true,
+        "noImplicitOverride": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "strictNullChecks": true,
         "strictFunctionTypes": true,
         "skipLibCheck": true,
+        "removeComments": false,
         "forceConsistentCasingInFileNames": true,
         "lib": [
             "dom",
+            "ES2017"
         ],
-        "outDir": "dist"
+        "outDir": "dist",
+        "types": ["vite/client"]
     },
     "include": [
-        "./src/**/*"
+        "src",
+        "src/index.d.ts",
+        "index.ts",
     ]
 }
