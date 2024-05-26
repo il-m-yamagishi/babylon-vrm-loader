@@ -1,10 +1,10 @@
 {
     "name": "@m-yamagishi/babylon-vrm-loader",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "description": "babylon.js VRM Loader",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "author": {
-        "email": "yamagishi.iloop@gmail.com",
+        "email": "akai_inu@live.jp",
         "name": "Masaru Yamagishi",
         "url": "https://github.com/il-m-yamagishi"
     },
@@ -14,7 +14,8 @@
     },
     "keywords": [
         "babylon.js",
-        "VRM"
+        "VRM",
+        "glTF"
     ],
     "files": [
         "dist/**/*",
@@ -22,30 +23,23 @@
     ],
     "typings": "dist/index.d.ts",
     "main": "dist/index.module.js",
-    "dependencies": {
-    },
     "devDependencies": {
-        "@babylonjs/core": "^7.0.0",
-        "@babylonjs/gui": "^7.0.0",
-        "@babylonjs/inspector": "^7.0.0",
-        "@babylonjs/loaders": "^7.0.0",
-        "@babylonjs/serializers": "^7.0.0",
-        "babylonjs-gltf2interface": "^7.0.0",
+        "@babylonjs/core": "^7.2.2",
+        "@babylonjs/gui": "^7.2.2",
+        "@babylonjs/inspector": "^7.2.2",
+        "@babylonjs/loaders": "^7.2.2",
+        "@babylonjs/serializers": "^7.2.2",
+        "babylonjs-gltf2interface": "^7.2.2",
         "typescript": "~5.4.5",
-        "vite": "^5.2.11"
+        "vite": "^5.2.11",
+        "vite-plugin-externalize-deps": "^0.8.0"
     },
     "scripts": {
-        "build": "webpack",
-        "build:gh-pages": "webpack --config webpack.test.config.js",
-        "lint": "yarn lint:check && yarn lint:fix",
-        "lint:check": "eslint src",
-        "lint:fix": "eslint src --fix",
-        "format": "yarn format:check && yarn format:fix",
-        "format:check": "prettier --check src",
-        "format:fix": "prettier --write src",
-        "debug": "webpack serve --config webpack.test.config.js",
-        "release": "semantic-release",
-        "release:gh-pages": "gh-pages -d test -u \"Masaru Yamagishi <m-yamagishi@virtualcast.jp>\" -m \"ci(gh-pages): update gh-pages [skip ci]\""
+        "dev": "vite",
+        "build": "vite build && tsc",
+        "test": "tsc",
+        "commit": "npx cz",
+        "lint": "biome ci index.ts src/*.ts"
     },
     "sideEffects": [
         "dist/index.js",
@@ -79,8 +73,8 @@
         ]
     },
     "peerDependencies": {
-        "@babylonjs/core": "^7.0.0",
-        "@babylonjs/loaders": "^7.0.0",
+        "@babylonjs/core": "^7.2.2",
+        "@babylonjs/loaders": "^7.2.2",
         "@m-yamagishi/babylon-mtoon-material": "*"
     }
 }

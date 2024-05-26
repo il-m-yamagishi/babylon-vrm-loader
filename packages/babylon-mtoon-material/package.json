@@ -2,7 +2,7 @@
     "name": "@m-yamagishi/babylon-mtoon-material",
     "version": "0.1.0",
     "description": "Port of VRM MToon Shader to Babylon.js WebGL",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "author": {
         "email": "akai_inu@live.jp",
         "name": "Masaru Yamagishi",
@@ -49,7 +49,7 @@
         "dev": "vite",
         "build": "vite build && tsc",
         "test": "tsc",
-        "commit": "cz",
+        "commit": "npx cz",
         "lint": "biome ci index.ts src/*.ts"
     },
     "config": {

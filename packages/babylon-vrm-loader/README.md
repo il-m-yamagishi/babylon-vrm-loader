@@ -1,21 +1,10 @@
 # babylon-vrm-loader
 
-[![npm version](https://badge.fury.io/js/babylon-vrm-loader.svg)](https://badge.fury.io/js/babylon-vrm-loader) [![CircleCI](https://circleci.com/gh/virtual-cast/babylon-vrm-loader.svg?style=svg)](https://circleci.com/gh/virtual-cast/babylon-vrm-loader) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 ![alicia.png](alicia.png)
 
 VRM porting to babylon.js.
-
-This loader is used as [VirtualCast](https://virtualcast.jp/) web VRM/VCI/glb viewer.
-
-## Supported version table
-
-|babylon.js version|babylon-vrm-loader version|
-|---|---|
-|~4.1.0|<1.5.0|
-|~4.2.0|^1.5.0|
-|^5.19.0|^2.0.0|
-|^6.0.0|will be ^3.0.0|
 
 ## Features
 
@@ -103,7 +92,6 @@ You can see inspector on http://localhost:8080/
 
 - [BabylonJS/Babylon.js: Babylon.js: a complete JavaScript framework for building 3D games with HTML 5 and WebGL](https://github.com/BabylonJS/Babylon.js)
 - [vrm-c/UniVRM: Unity package that can import and export VRM format](https://github.com/vrm-c/UniVRM)
-- [virtual-cast/babylon-mtoon-material: Unity MToon Shader WebGL porting to babylon.js.](https://github.com/virtual-cast/babylon-mtoon-material)
 
 ## Licenses
 

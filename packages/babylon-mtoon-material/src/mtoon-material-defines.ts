@@ -1,6 +1,6 @@
 /**
  * Babylon.js MToon Material Defines
- * @license MIT
+ * @license Apache-2.0
  * @author Masaru Yamagishi
  */
 
